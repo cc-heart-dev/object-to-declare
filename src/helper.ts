@@ -4,7 +4,6 @@ export enum TypeGroup {
   Object,
 }
 
-
 export interface JsonToTSOptions {
   rootName?: string
 }

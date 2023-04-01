@@ -1,20 +1,21 @@
 import { isNull, isObject } from '@cc-heart/utils'
-import { type ITypeStruct, TypeGroup } from './helper'
 import { getHashByObject } from './utils'
+import { type ITypeStruct, TypeGroup } from './helper'
+
 export function getTypeGroup(target: unknown) {
-  if (Array.isArray(target))
-    return TypeGroup.Array
-  if (isObject(target))
-    return TypeGroup.Object
+  if (Array.isArray(target)) return TypeGroup.Array
+  if (isObject(target)) return TypeGroup.Object
   return TypeGroup.Primitive
 }
 
 export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '') {
   switch (getTypeGroup(targetObj)) {
     case TypeGroup.Array:
-      const typeArrayStructList = (targetObj as Array<unknown>).map(val => {
-        return getTypeStruct(val, typeStructList, name)
-      }).filter((val, index, self) => self.indexOf(val) === index)
+      const typeArrayStructList = (targetObj as Array<unknown>)
+        .map((val) => {
+          return getTypeStruct(val, typeStructList, name)
+        })
+        .filter((val, index, self) => self.indexOf(val) === index)
       return typeArrayStructList.join(' | ')
     case TypeGroup.Object:
       const target = getTypeOfObject(targetObj as object, typeStructList)
@@ -22,7 +23,7 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
       typeStructList.push({
         hash,
         name,
-        target
+        target,
       })
       return hash
     case TypeGroup.Primitive:

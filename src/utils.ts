@@ -1,9 +1,5 @@
-import { isObject } from "@cc-heart/utils";
-// import { getTypeGroup } from "./typeStruct";
+import { isObject } from '@cc-heart/utils'
 
-function isPrimitive(target: unknown) {
-  return typeof target !== 'object' || target === null
-}
 export function isArrayObject(target: unknown) {
   return Array.isArray(target) && target.reduce<boolean>((acc, cur) => acc && isObject(cur), true)
 }

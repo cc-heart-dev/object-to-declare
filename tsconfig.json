@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "outDir": "dist/types",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -23,12 +21,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
-  "exclude": [
-    "__test__/**/*",
-    "node_modules/**/*",
-    "rollup.config.js",
-    "types/**/*"
-  ]
+  "exclude": ["__test__/**/*", "node_modules/**/*", "rollup.config.js", "types/**/*"]
 }

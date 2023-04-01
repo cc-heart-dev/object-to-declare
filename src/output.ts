@@ -1,11 +1,10 @@
-import type { ITypeStruct } from "./helper";
-import { isHash } from "./utils";
-
+import type { ITypeStruct } from './helper'
+import { isHash } from './utils'
 
 export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: Array<string>) {
   let str = ''
 
-  const data = target.find(item => item.hash === hash)
+  const data = target.find((item) => item.hash === hash)
   if (data) {
     str += `interface ${data.name} {\n`
     Object.entries(data.target).forEach(([key, value]) => {
@@ -23,7 +22,7 @@ export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: 
 }
 
 export function output(target: ITypeStruct[], rootName: string, rootIsArray: boolean) {
-  const { hash } = target.find(val => val.name === rootName)
+  const { hash } = target.find((val) => val.name === rootName)
   const list: Array<string> = []
   const rootInterface = optimizeTypeStructure(target, hash, list)
   list.unshift(rootInterface)
@@ -34,6 +33,4 @@ export function output(target: ITypeStruct[], rootName: string, rootIsArray: boo
   return list.reduce((acc, cur) => {
     return acc + (acc ? '\n' : '') + cur
   }, '')
-
-
 }

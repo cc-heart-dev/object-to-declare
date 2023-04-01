@@ -1,9 +1,9 @@
-import { isObject } from "@cc-heart/utils";
-import { covertToInterface } from "./convertToInterface";
-import type { ITypeStruct, JsonToTSOptions } from "./helper";
-import { output } from "./output";
-import { getTypeStruct } from "./typeStruct";
-import { isArrayObject } from "./utils";
+import { isObject } from '@cc-heart/utils'
+import { covertToInterface } from './convertToInterface'
+import { output } from './output'
+import { getTypeStruct } from './typeStruct'
+import { isArrayObject } from './utils'
+import type { ITypeStruct, JsonToTSOptions } from './helper'
 
 export default function jsonToTsDeclare(target: unknown, options: JsonToTSOptions = {}) {
   const defaultOptions = {

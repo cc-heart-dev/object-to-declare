@@ -8,7 +8,7 @@ describe('Common interface', () => {
       str: '',
       bool: true,
       non: null,
-      undef: void 0
+      undef: void 0,
     }
     expect(jsonToTsDeclare(target)).toEqual(`interface IRootName {
   num: number
@@ -22,10 +22,10 @@ describe('Common interface', () => {
   it('should interface name is inter when rootName is inter', () => {
     const target = {
       foo: 1,
-      bar: '1'
+      bar: '1',
     }
     const options: JsonToTSOptions = {
-      rootName: 'inter'
+      rootName: 'inter',
     }
 
     expect(jsonToTsDeclare(target, options)).toEqual(`interface inter {
@@ -33,7 +33,6 @@ describe('Common interface', () => {
   bar: string
 }`)
   })
-
 
   it('should throw error when target is unObject', () => {
     const target = 1
