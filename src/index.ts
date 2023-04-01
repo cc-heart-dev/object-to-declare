@@ -5,7 +5,7 @@ import { getTypeStruct } from './typeStruct'
 import { isArrayObject } from './utils'
 import type { ITypeStruct, JsonToTSOptions } from './helper'
 
-export default function jsonToTsDeclare(target: unknown, options: JsonToTSOptions = {}) {
+export default function generateTypeDeclaration(target: unknown, options: JsonToTSOptions = {}) {
   const defaultOptions = {
     rootName: 'IRootName',
   }

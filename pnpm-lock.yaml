@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@cc-heart/utils': ^2.0.5
+  '@rollup/plugin-typescript': ^11.0.0
   '@types/node': ^18.15.5
   json-to-ts: ^1.7.0
   ts-node: ^10.9.1
@@ -9,6 +10,7 @@ specifiers:
 
 dependencies:
   '@cc-heart/utils': 2.0.5
+  '@rollup/plugin-typescript': 11.0.0_typescript@5.0.2
   '@types/node': 18.15.5
   json-to-ts: 1.7.0
   ts-node: 10.9.1_zlbzrxdj56n2qhafx752nt3nlm
@@ -240,6 +242,38 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: false
 
+  /@rollup/plugin-typescript/11.0.0_typescript@5.0.2:
+    resolution: { integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ== }
+    engines: { node: '>=14.0.0' }
+    peerDependencies:
+      rollup: ^2.14.0||^3.0.0
+      tslib: '*'
+      typescript: '>=3.7.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      tslib:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2
+      resolve: 1.22.1
+      typescript: 5.0.2
+    dev: false
+
+  /@rollup/pluginutils/5.0.2:
+    resolution: { integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA== }
+    engines: { node: '>=14.0.0' }
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+    dev: false
+
   /@tsconfig/node10/1.0.9:
     resolution: { integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA== }
     dev: false
@@ -264,6 +298,10 @@ packages:
 
   /@types/chai/4.3.4:
     resolution: { integrity: sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw== }
+    dev: false
+
+  /@types/estree/1.0.0:
+    resolution: { integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ== }
     dev: false
 
   /@types/node/18.15.5:
@@ -565,6 +603,10 @@ packages:
       '@esbuild/win32-arm64': 0.17.14
       '@esbuild/win32-ia32': 0.17.14
       '@esbuild/win32-x64': 0.17.14
+    dev: false
+
+  /estree-walker/2.0.2:
+    resolution: { integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w== }
     dev: false
 
   /for-each/0.3.3:
@@ -906,6 +948,11 @@ packages:
 
   /picocolors/1.0.0:
     resolution: { integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ== }
+    dev: false
+
+  /picomatch/2.3.1:
+    resolution: { integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA== }
+    engines: { node: '>=8.6' }
     dev: false
 
   /pkg-types/1.0.2:

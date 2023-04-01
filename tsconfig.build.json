@@ -12,7 +12,7 @@
     "allowJs": false,
     "downlevelIteration": true,
     "importHelpers": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "stripInternal": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -23,7 +23,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "exclude": [
     "test/**/*",
