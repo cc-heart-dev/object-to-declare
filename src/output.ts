@@ -1,9 +1,8 @@
-import type { ITypeStruct } from './helper'
+import { ITypeStruct, TypeGroup } from './helper'
 import { isHash } from './utils'
 
 export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: Array<string>) {
   let str = ''
-
   const data = target.find((item) => item.hash === hash)
   if (data) {
     str += `interface ${data.name} {\n`
@@ -11,6 +10,18 @@ export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: 
       if (value !== null && isHash(value)) {
         const subInterface = optimizeTypeStructure(target, value, map)
         map.unshift(subInterface)
+
+        const subInterfaceTarget = target.find(_ => _.hash === value)
+        if (subInterfaceTarget) {
+          const { name } = subInterfaceTarget
+          let typeVal;
+          switch (subInterfaceTarget.type) {
+            case TypeGroup.Array:
+              typeVal = `${name}[]`
+          }
+          str += `  ${key}: ${typeVal}\n`
+        }
+
       } else {
         str += `  ${key}: ${value}\n`
       }

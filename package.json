@@ -10,7 +10,8 @@
     "coverage": "vitest run --coverage",
     "prettier": "npx prettier --write .",
     "prebuild": "rimraf dist types",
-    "build": "tsc -p tsconfig.build.json && rollup -c"
+    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "deploy": "npm run prebuild && npm run build"
   },
   "keywords": [],
   "author": "heart",
@@ -22,5 +23,8 @@
     "json-to-ts": "^1.7.0",
     "ts-node": "^10.9.1",
     "vitest": "^0.29.8"
+  },
+  "devDependencies": {
+    "tslib": "^2.5.0"
   }
 }

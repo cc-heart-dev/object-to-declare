@@ -11,5 +11,6 @@ export interface JsonToTSOptions {
 export interface ITypeStruct {
   hash: string
   name?: string
+  type: TypeGroup
   target: Record<string, string>
 }

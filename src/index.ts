@@ -17,6 +17,5 @@ export default function generateTypeDeclaration(target: unknown, options: JsonTo
   const newOption = { ...defaultOptions, ...options }
   const typeStructList: ITypeStruct[] = []
   getTypeStruct(target, typeStructList, newOption.rootName)
-
   return covertToInterface(output(typeStructList, newOption.rootName, Array.isArray(target)))
 }

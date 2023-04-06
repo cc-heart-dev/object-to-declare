@@ -4,6 +4,13 @@ function covertToInterface(target) {
     return target.replaceAll(/"|,/g, '');
 }
 
+var TypeGroup;
+(function (TypeGroup) {
+    TypeGroup[TypeGroup["Primitive"] = 0] = "Primitive";
+    TypeGroup[TypeGroup["Array"] = 1] = "Array";
+    TypeGroup[TypeGroup["Object"] = 2] = "Object";
+})(TypeGroup || (TypeGroup = {}));
+
 function isArrayObject(target) {
     return Array.isArray(target) && target.reduce((acc, cur) => acc && isObject(cur), true);
 }
@@ -30,6 +37,16 @@ function optimizeTypeStructure(target, hash, map) {
             if (value !== null && isHash(value)) {
                 const subInterface = optimizeTypeStructure(target, value, map);
                 map.unshift(subInterface);
+                const subInterfaceTarget = target.find(_ => _.hash === value);
+                if (subInterfaceTarget) {
+                    const { name } = subInterfaceTarget;
+                    let typeVal;
+                    switch (subInterfaceTarget.type) {
+                        case TypeGroup.Array:
+                            typeVal = `${name}[]`;
+                    }
+                    str += `  ${key}: ${typeVal}\n`;
+                }
             }
             else {
                 str += `  ${key}: ${value}\n`;
@@ -52,13 +69,6 @@ function output(target, rootName, rootIsArray) {
     }, '');
 }
 
-var TypeGroup;
-(function (TypeGroup) {
-    TypeGroup[TypeGroup["Primitive"] = 0] = "Primitive";
-    TypeGroup[TypeGroup["Array"] = 1] = "Array";
-    TypeGroup[TypeGroup["Object"] = 2] = "Object";
-})(TypeGroup || (TypeGroup = {}));
-
 function getTypeGroup(target) {
     if (Array.isArray(target))
         return TypeGroup.Array;
@@ -66,12 +76,12 @@ function getTypeGroup(target) {
         return TypeGroup.Object;
     return TypeGroup.Primitive;
 }
-function getTypeStruct(targetObj, typeStructList = [], name = '') {
+function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGroup.Object) {
     switch (getTypeGroup(targetObj)) {
         case TypeGroup.Array:
             const typeArrayStructList = targetObj
                 .map((val) => {
-                return getTypeStruct(val, typeStructList, name);
+                return getTypeStruct(val, typeStructList, name, TypeGroup.Array);
             })
                 .filter((val, index, self) => self.indexOf(val) === index);
             return typeArrayStructList.join(' | ');
@@ -82,6 +92,7 @@ function getTypeStruct(targetObj, typeStructList = [], name = '') {
                 hash,
                 name,
                 target,
+                type
             });
             return hash;
         case TypeGroup.Primitive:
@@ -91,7 +102,7 @@ function getTypeStruct(targetObj, typeStructList = [], name = '') {
 function getTypeOfObject(targetObj, typeStructList) {
     return Object.entries(targetObj).reduce((acc, [key, value]) => {
         // object array primitive
-        acc[key] = getTypeStruct(value, typeStructList, key);
+        acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object);
         return acc;
     }, {});
 }

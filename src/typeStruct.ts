@@ -8,12 +8,12 @@ export function getTypeGroup(target: unknown) {
   return TypeGroup.Primitive
 }
 
-export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '') {
+export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '', type = TypeGroup.Object) {
   switch (getTypeGroup(targetObj)) {
     case TypeGroup.Array:
       const typeArrayStructList = (targetObj as Array<unknown>)
         .map((val) => {
-          return getTypeStruct(val, typeStructList, name)
+          return getTypeStruct(val, typeStructList, name, TypeGroup.Array)
         })
         .filter((val, index, self) => self.indexOf(val) === index)
       return typeArrayStructList.join(' | ')
@@ -24,6 +24,7 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
         hash,
         name,
         target,
+        type
       })
       return hash
     case TypeGroup.Primitive:
@@ -34,7 +35,7 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
 function getTypeOfObject<T extends object>(targetObj: T, typeStructList: ITypeStruct[]) {
   return Object.entries(targetObj).reduce((acc, [key, value]) => {
     // object array primitive
-    acc[key] = getTypeStruct(value, typeStructList, key)
+    acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object)
     return acc
   }, {} as Record<keyof T, string>)
 }

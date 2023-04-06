@@ -5,3 +5,5 @@ node_modules
 
 .obsidian
 publish.sh
+
+example/playground.ts
