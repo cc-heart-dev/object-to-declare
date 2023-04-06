@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/object-to-declare",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "type": "module",
