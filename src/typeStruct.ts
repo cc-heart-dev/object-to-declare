@@ -24,7 +24,7 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
         hash,
         name,
         target,
-        type
+        type,
       })
       return hash
     case TypeGroup.Primitive:

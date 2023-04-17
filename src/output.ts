@@ -11,17 +11,19 @@ export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: 
         const subInterface = optimizeTypeStructure(target, value, map)
         map.unshift(subInterface)
 
-        const subInterfaceTarget = target.find(_ => _.hash === value)
+        const subInterfaceTarget = target.find((_) => _.hash === value)
         if (subInterfaceTarget) {
           const { name } = subInterfaceTarget
-          let typeVal;
+          let typeVal
           switch (subInterfaceTarget.type) {
             case TypeGroup.Array:
               typeVal = `${name}[]`
+              break
+            default:
+              typeVal = name
           }
           str += `  ${key}: ${typeVal}\n`
         }
-
       } else {
         str += `  ${key}: ${value}\n`
       }
