@@ -29,5 +29,10 @@ const myObject = {
 const typeDeclaration = generateTypeDeclaration(myObject)
 
 console.log(typeDeclaration)
-// Output: { id: number; name: string; age: number; email: string; }
+// Output: interface IRootName {
+//   id: number
+//   name: string
+//   age: number
+//   email: string
+// }
 ```
