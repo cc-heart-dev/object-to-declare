@@ -1,3 +1,4 @@
+import { underlineToHump } from '@cc-heart/utils'
 import { ITypeStruct, TypeGroup } from './helper'
 import { isHash } from './utils'
 
@@ -8,6 +9,7 @@ export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: 
     str += `interface ${data.name} {\n`
     Object.entries(data.target).forEach(([key, value]) => {
       if (value !== null && isHash(value)) {
+        key = underlineToHump(key)
         const subInterface = optimizeTypeStructure(target, value, map)
         map.unshift(subInterface)
 

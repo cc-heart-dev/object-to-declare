@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/object-to-declare",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -13,9 +13,20 @@
     "build": "tsc -p tsconfig.build.json && rollup -c",
     "deploy": "npm run prebuild && npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "object2declare"
+  ],
   "author": "heart",
   "license": "MIT",
+  "exports": {
+    ".": [
+      {
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.cjs",
+        "types": "./dist/types/src/index.d.ts"
+      }
+    ]
+  },
   "dependencies": {
     "@cc-heart/utils": "^2.0.5",
     "@rollup/plugin-typescript": "^11.0.0",

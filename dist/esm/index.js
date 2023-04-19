@@ -1,4 +1,4 @@
-import { isObject, isNull } from '@cc-heart/utils';
+import { isObject, underlineToHump, isNull } from '@cc-heart/utils';
 
 function covertToInterface(target) {
     return target.replaceAll(/"|,/g, '');
@@ -35,15 +35,19 @@ function optimizeTypeStructure(target, hash, map) {
         str += `interface ${data.name} {\n`;
         Object.entries(data.target).forEach(([key, value]) => {
             if (value !== null && isHash(value)) {
+                key = underlineToHump(key);
                 const subInterface = optimizeTypeStructure(target, value, map);
                 map.unshift(subInterface);
-                const subInterfaceTarget = target.find(_ => _.hash === value);
+                const subInterfaceTarget = target.find((_) => _.hash === value);
                 if (subInterfaceTarget) {
                     const { name } = subInterfaceTarget;
                     let typeVal;
                     switch (subInterfaceTarget.type) {
                         case TypeGroup.Array:
                             typeVal = `${name}[]`;
+                            break;
+                        default:
+                            typeVal = name;
                     }
                     str += `  ${key}: ${typeVal}\n`;
                 }
@@ -92,7 +96,7 @@ function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGro
                 hash,
                 name,
                 target,
-                type
+                type,
             });
             return hash;
         case TypeGroup.Primitive:
