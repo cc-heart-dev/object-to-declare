@@ -16,7 +16,14 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
           return getTypeStruct(val, typeStructList, name, TypeGroup.Array)
         })
         .filter((val, index, self) => self.indexOf(val) === index)
-      return typeArrayStructList.join(' | ')
+      switch (typeArrayStructList.length) {
+        case 0:
+          return []
+        case 1:
+          return typeArrayStructList.join(' | ')
+        default:
+          return `(${typeArrayStructList.join(' | ')})[]`
+      }
     case TypeGroup.Object:
       const target = getTypeOfObject(targetObj as object, typeStructList)
       const hash = getHashByObject(target)

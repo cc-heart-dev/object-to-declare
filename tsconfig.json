@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "outDir": "dist/types",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -23,5 +25,12 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "exclude": ["test/**/*", "node_modules/**/*", "rollup.config.js", "vitest.config.ts", "example/**/*"]
+  "exclude": [
+    "test/**/*",
+    "node_modules/**/*",
+    "playground/**/*",
+    "rollup.config.js",
+    "vitest.config.ts",
+    "example/**/*"
+  ],
 }
