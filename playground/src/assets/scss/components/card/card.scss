@@ -1,0 +1,16 @@
+@use '@/assets/scss/var/variable.scss' as var;
+
+$border-style: 1px solid var(--box-color-1);
+.#{var.$prefixCls}-card {
+  border: $border-style;
+
+  @at-root {
+    &__title {
+      border-radius: inherit;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom: $border-style;
+      background-color: var(--bg-color-2);
+    }
+  }
+}
