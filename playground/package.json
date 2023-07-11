@@ -11,16 +11,16 @@
   "dependencies": {
     "@cc-heart/eslint-config": "^0.0.5",
     "@cc-heart/object-to-declare": "^1.0.5",
-    "@cc-heart/utils": "^2.0.12",
+    "@cc-heart/utils": "^2.0.17",
     "@cc-heart/utils-client": "^0.0.12",
     "@codemirror/lang-css": "^6.2.0",
-    "@codemirror/lang-html": "^6.4.3",
-    "@codemirror/lang-javascript": "^6.1.8",
+    "@codemirror/lang-html": "^6.4.5",
+    "@codemirror/lang-javascript": "^6.1.9",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/theme-one-dark": "^6.1.2",
-    "@codemirror/view": "^6.12.0",
-    "@intlify/unplugin-vue-i18n": "^0.10.0",
-    "@types/node": "^20.2.4",
+    "@codemirror/view": "^6.14.1",
+    "@intlify/unplugin-vue-i18n": "^0.10.1",
+    "@types/node": "^20.4.1",
     "@types/splitpanes": "^2.2.1",
     "@types/vue-i18n": "^7.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
@@ -29,19 +29,19 @@
     "markdown-it-link-attributes": "^4.0.1",
     "markdown-it-shiki": "^0.9.0",
     "nprogress": "^0.2.0",
-    "sass": "^1.62.1",
+    "sass": "^1.63.6",
     "splitpanes": "^3.1.5",
     "unocss": "^0.51.13",
     "vite-plugin-pages": "^0.29.1",
     "vite-plugin-vue-markdown": "^0.23.5",
     "vue": "^3.3.4",
     "vue-i18n": "^9.2.2",
-    "vue-router": "^4.2.1"
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "typescript": "^5.0.4",
-    "vite": "^4.3.8",
-    "vue-tsc": "^1.6.5"
+    "typescript": "^5.1.6",
+    "vite": "^4.4.3",
+    "vue-tsc": "^1.8.4"
   }
 }
