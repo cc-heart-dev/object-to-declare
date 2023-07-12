@@ -29,13 +29,14 @@ const toGithub = () => {
 .#{var.$prefixCls}-header {
   height: 60px;
   box-shadow: 0 1px 0 var(--box-color-1);
+  flex-shrink: 0;
 
   &__icon {
     color: var(--color-text-2);
 
-    & > div,
-    & > button,
-    & > svg {
+    &>div,
+    &>button,
+    &>svg {
       margin: 0 0.5rem;
     }
 

@@ -43,7 +43,7 @@ export default defineComponent({
       }
     )
     return () => (
-      <div class="p-3 w-full h-full">
+      <div class="p-3 flex-1 overflow-auto">
         <Splitpanes class="default-theme">
           <Pane>
             <Splitpanes class="default-theme" horizontal>

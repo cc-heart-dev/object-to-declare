@@ -136,8 +136,10 @@ defineExpose({
 @use '@/assets/scss/var/variable.scss' as var;
 
 .code-mirror {
-  width: 100%;
-  height: 100%;
+  flex: 1;
+  overflow: hidden;
+  // flex-grow: 0;
+  // overflow: auto;
 }
 
 .cm-editor {

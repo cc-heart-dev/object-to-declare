@@ -11,8 +11,8 @@ export function getHashByObject(obj: unknown) {
 
 export function isHash(target: string) {
   try {
-    JSON.parse(target)
-    return true
+    const hash = JSON.parse(target)
+    return hash !== null && !Array.isArray(hash)
   } catch {
     return false
   }

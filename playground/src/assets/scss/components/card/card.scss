@@ -1,8 +1,11 @@
 @use '@/assets/scss/var/variable.scss' as var;
 
 $border-style: 1px solid var(--box-color-1);
+
 .#{var.$prefixCls}-card {
   border: $border-style;
+  display: flex;
+  flex-direction: column;
 
   @at-root {
     &__title {
