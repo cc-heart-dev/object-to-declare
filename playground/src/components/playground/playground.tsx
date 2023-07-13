@@ -21,7 +21,7 @@ export default defineComponent({
 
     const func = useDebounce((data) => {
       try {
-        const target = new Function(`return ${data}`)()
+        const target = new Function(`return ${data.trim()}`)()
         typeDeclaration.value = generateTypeDeclaration(target)
         typeInstanceRef.value?.clear()
         typeInstanceRef.value?.setValue(typeDeclaration.value)
@@ -48,7 +48,7 @@ export default defineComponent({
           <Pane>
             <Splitpanes class="default-theme" horizontal>
               <Pane>
-                <Card v-slots={{ title: () => 'object or array' }}>
+                <Card v-slots={{ title: () => 'object or array object' }}>
                   <CodeMirror value={script.value} lang="json" onChange={(e) => handleChange(e, script)} />
                 </Card>
               </Pane>
