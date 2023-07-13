@@ -27,6 +27,8 @@ export default defineComponent({
         typeInstanceRef.value?.setValue(typeDeclaration.value)
       } catch (e) {
         console.log(e)
+        typeInstanceRef.value?.clear()
+        typeInstanceRef.value?.setValue((e as Error).toString())
       }
     }, 500)
 

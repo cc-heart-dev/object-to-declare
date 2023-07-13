@@ -10,7 +10,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { isDark } from '@/configs/index'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { usePrefixCls } from '@/hooks'
 interface IProps {
   isReadonly?: boolean
@@ -22,6 +22,10 @@ const props = withDefaults(defineProps<IProps>(), {
   lang: 'javascript',
 })
 const val = ref('')
+
+const state = reactive({
+  length: 0
+})
 
 watch(isDark, (bool) => {
   if (bool) {
@@ -83,6 +87,7 @@ function updateTheme() {
       doc: props.value || val.value,
       dispatch(tr) {
         view.update([tr])
+        state.length = tr.state.doc.length
         val.value = view.state.doc.toString()
       },
     })
@@ -112,11 +117,8 @@ watch(
 )
 
 function clear() {
-  const changes = (view as EditorView & viewInstance).viewState.state.doc.text.reduce((acc, cur) => {
-    acc += cur.length + 1
-    return acc
-  }, 0)
-  view.dispatch({ changes: [{ from: 0, to: changes - 1 }] })
+  // console.log(state.length, 'state.length');
+  view.dispatch({ changes: [{ from: 0, to: state.length }] })
 }
 
 function getValue() {
