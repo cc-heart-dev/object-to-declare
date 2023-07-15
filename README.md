@@ -4,7 +4,7 @@ Object-to-Declare is a lightweight utility library that allows developers to eas
 
 ## install
 
-You can install` Object-to-Declare` via npm:
+You can install`Object-to-Declare` via npm:
 
 ```shell
 npm install @cc-heart/object-to-declare

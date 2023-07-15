@@ -3,7 +3,7 @@
   "version": "1.0.6",
   "description": "",
   "type": "module",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/types/src/index.d.ts",
   "scripts": {
     "debug": "ts-node-esm index.ts --inspect-brk=8888",
     "test": "vitest",
