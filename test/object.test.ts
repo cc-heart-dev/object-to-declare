@@ -26,7 +26,7 @@ interface mysql {
   host: string
   logging: boolean
   port: number
-}`
+}`,
     )
   })
 })

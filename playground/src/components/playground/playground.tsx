@@ -42,7 +42,7 @@ export default defineComponent({
       () => script.value,
       (data) => {
         func(data)
-      }
+      },
     )
     return () => (
       <div class="p-3 flex-1 overflow-auto">
@@ -50,7 +50,7 @@ export default defineComponent({
           <Pane>
             <Splitpanes class="default-theme" horizontal>
               <Pane>
-                <Card v-slots={{ title: () => 'object or array object' }}>
+                <Card v-slots={{ title: () => 'input object or array object' }}>
                   <CodeMirror value={script.value} lang="json" onChange={(e) => handleChange(e, script)} />
                 </Card>
               </Pane>
@@ -62,9 +62,6 @@ export default defineComponent({
                 title: () => (
                   <div class="flex w-full items-center justify-between">
                     <span>output types</span>
-                    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                    {/* @ts-ignore */}
-                    <Copy onCopy={handleCopy}></Copy>
                   </div>
                 ),
               }}

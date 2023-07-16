@@ -14,7 +14,7 @@ const localesMap = Object.fromEntries(
   Object.entries(import.meta.glob('../locales/*.yaml')).map(([path, loadLocale]) => {
     // 匹配数据
     return [path.match(/([\w-]*)\.yaml$/)?.[1], loadLocale]
-  })
+  }),
 ) as Record<Locale, () => { default: Promise<Record<string, string>> }>
 
 console.log(localesMap)

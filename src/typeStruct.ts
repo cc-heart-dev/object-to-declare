@@ -40,11 +40,14 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
 }
 
 function getTypeOfObject<T extends object>(targetObj: T, typeStructList: ITypeStruct[]) {
-  return Object.entries(targetObj).reduce((acc, [key, value]) => {
-    // object array primitive
-    acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object)
-    return acc
-  }, {} as Record<keyof T, string>)
+  return Object.entries(targetObj).reduce(
+    (acc, [key, value]) => {
+      // object array primitive
+      acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object)
+      return acc
+    },
+    {} as Record<keyof T, string>,
+  )
 }
 
 function getTypeOfPrimitive(target: unknown) {
