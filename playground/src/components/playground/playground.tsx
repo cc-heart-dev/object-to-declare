@@ -31,11 +31,6 @@ export default defineComponent({
       }
     }, 500)
 
-    const handleCopy = () => {
-      if (typeDeclaration.value) {
-        copy(typeDeclaration.value)
-      }
-    }
 
     watch(
       () => script.value,
