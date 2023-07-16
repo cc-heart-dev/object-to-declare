@@ -5,7 +5,6 @@ import CodeMirror from '@/components/codeMirror/index.vue'
 import Card from '@/components/Card/Container'
 import { useDebounce } from '@/hooks/useDebounce'
 import generateTypeDeclaration from '@cc-heart/object-to-declare'
-import Copy from '@/icons/copy.vue'
 import { copy } from '@cc-heart/utils-client'
 
 type fn = (...args: any) => any
