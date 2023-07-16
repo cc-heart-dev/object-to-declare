@@ -2,15 +2,20 @@ import { underlineToHump } from '@cc-heart/utils'
 import { ITypeStruct, TypeGroup } from './helper'
 import { isHash } from './utils'
 
-export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: Array<string>) {
+export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: Array<string>, cacheTypesName: Set<string> = new Set()) {
   let str = ''
   const data = target.find((item) => item.hash === hash)
+  let name = data.name
   if (data) {
-    str += `interface ${data.name} {\n`
+    if (cacheTypesName.has(name)) {
+      return str
+    }
+    cacheTypesName.add(name)
+    str += `interface ${name} {\n`
     Object.entries(data.target).forEach(([key, value]) => {
       if (value !== null && isHash(value)) {
         key = underlineToHump(key)
-        const subInterface = optimizeTypeStructure(target, value, map)
+        const subInterface = optimizeTypeStructure(target, value, map, cacheTypesName)
         map.unshift(subInterface)
 
         const subInterfaceTarget = target.find((_) => _.hash === value)

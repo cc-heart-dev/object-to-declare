@@ -1,6 +1,6 @@
 import { expect, describe, it } from 'vitest'
 import { JsonToTSOptions } from '../src/helper'
-import jsonToTsDeclare from '../src/index'
+import generateTypeDeclaration from '../src/index'
 describe('Common interface', () => {
   it('should be defined', () => {
     const target = {
@@ -10,7 +10,7 @@ describe('Common interface', () => {
       non: null,
       undef: void 0,
     }
-    expect(jsonToTsDeclare(target)).toEqual(`interface IRootName {
+    expect(generateTypeDeclaration(target)).toEqual(`interface IRootName {
   num: number
   str: string
   bool: boolean
@@ -28,7 +28,7 @@ describe('Common interface', () => {
       rootName: 'inter',
     }
 
-    expect(jsonToTsDeclare(target, options)).toEqual(`interface inter {
+    expect(generateTypeDeclaration(target, options)).toEqual(`interface inter {
   foo: number
   bar: string
 }`)
@@ -36,11 +36,29 @@ describe('Common interface', () => {
 
   it('should throw error when target is unObject', () => {
     const target = 1
-    expect(() => jsonToTsDeclare(target)).toThrowError('target must be object or objectArray')
+    expect(() => generateTypeDeclaration(target)).toThrowError('target must be object or objectArray')
   })
 
   it('should throw error when target is unObjectArray', () => {
     const target = [1]
-    expect(() => jsonToTsDeclare(target)).toThrowError('target must be object or objectArray')
+    expect(() => generateTypeDeclaration(target)).toThrowError('target must be object or objectArray')
+  })
+
+  it('Ignore repetitive dependencies when there are identical data objects', () => {
+    const target = {
+      sign: { url: 'https' },
+      lotto: {
+        url: 'https',
+      },
+    }
+    console.log('target', generateTypeDeclaration(target))
+    expect(generateTypeDeclaration(target)).toEqual(`interface IRootName {
+  sign: sign
+  lotto: sign
+}
+
+interface sign {
+  url: string
+}`)
   })
 })

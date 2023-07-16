@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<IProps>(), {
 const val = ref('')
 
 const state = reactive({
-  length: 0
+  length: 0,
 })
 
 watch(isDark, (bool) => {

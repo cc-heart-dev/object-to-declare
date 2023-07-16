@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import jsonToTsDeclare from '../src'
+import generateTypeDeclaration from '../src'
 
 describe('Interface for merging arrays', () => {
   it('should return defined when target is array', () => {
@@ -8,7 +8,7 @@ describe('Interface for merging arrays', () => {
       { label: 'dd', value: 2 },
     ]
 
-    expect(jsonToTsDeclare(target)).toEqual(`type IRootNameType = IRootName[]
+    expect(generateTypeDeclaration(target)).toEqual(`type IRootNameType = IRootName[]
 
 interface IRootName {
   label: string

@@ -34,9 +34,9 @@ const toGithub = () => {
   &__icon {
     color: var(--color-text-2);
 
-    &>div,
-    &>button,
-    &>svg {
+    & > div,
+    & > button,
+    & > svg {
       margin: 0 0.5rem;
     }
 

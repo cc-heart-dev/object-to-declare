@@ -1,4 +1,4 @@
-import jsonToTsDeclare from '../src'
+import generateTypeDeclaration from '../src'
 import { describe, it, expect } from 'vitest'
 
 describe('object to declare', () => {
@@ -14,7 +14,7 @@ describe('object to declare', () => {
         port: 3306,
       },
     }
-    expect(jsonToTsDeclare(target)).toEqual(
+    expect(generateTypeDeclaration(target)).toEqual(
       `interface IRootName {
   mysql: mysql
 }
