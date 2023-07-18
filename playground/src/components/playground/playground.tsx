@@ -44,7 +44,7 @@ export default defineComponent({
             <Splitpanes class="default-theme" horizontal>
               <Pane>
                 <Card v-slots={{ title: () => 'input object or array object' }}>
-                  <CodeMirror value={script.value} lang="json" onChange={(e) => handleChange(e, script)} />
+                  <CodeMirror value={script.value} lang="javascript" onChange={(e) => handleChange(e, script)} />
                 </Card>
               </Pane>
             </Splitpanes>
