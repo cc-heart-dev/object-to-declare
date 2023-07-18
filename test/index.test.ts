@@ -62,3 +62,65 @@ interface sign {
 }`)
   })
 })
+
+describe('Interface for merging arrays', () => {
+  it('should return defined when target is array', () => {
+    const target = [
+      { label: 'kk', value: 1 },
+      { label: 'dd', value: 2 },
+    ]
+
+    expect(generateTypeDeclaration(target)).toEqual(`type IRootNameType = IRootName[]
+
+interface IRootName {
+  label: string
+  value: number
+}`)
+  })
+
+  it('should return defined', () => {
+    const target = {
+      sign: { url: 'https://' },
+      lotto: { url: 'http://' }
+    }
+    expect(generateTypeDeclaration(target)).toEqual(`interface IRootName {
+  sign: sign
+  lotto: sign
+}
+
+interface sign {
+  url: string
+}`)
+  })
+
+})
+
+describe('object to declare', () => {
+  it('should return two interface when target is complex object', () => {
+    const target = {
+      mysql: {
+        type: 'mysql',
+        database: 'pic',
+        username: 'root',
+        password: '123456',
+        host: 'localhost',
+        logging: true,
+        port: 3306,
+      },
+    }
+    expect(generateTypeDeclaration(target)).toEqual(
+      `interface IRootName {
+  mysql: mysql
+}
+interface mysql {
+  type: string
+  database: string
+  username: string
+  password: string
+  host: string
+  logging: boolean
+  port: number
+}`,
+    )
+  })
+})
