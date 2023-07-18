@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/object-to-declare",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "type": "module",
   "types": "dist/types/src/index.d.ts",
