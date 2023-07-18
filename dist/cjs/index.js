@@ -30,15 +30,20 @@ function isHash(target) {
     }
 }
 
-function optimizeTypeStructure(target, hash, map) {
+function optimizeTypeStructure(target, hash, map, cacheTypesName = new Set()) {
     let str = '';
     const data = target.find((item) => item.hash === hash);
+    let name = data.name;
     if (data) {
-        str += `interface ${data.name} {\n`;
+        if (cacheTypesName.has(name)) {
+            return str;
+        }
+        cacheTypesName.add(name);
+        str += `interface ${name} {\n`;
         Object.entries(data.target).forEach(([key, value]) => {
             if (value !== null && isHash(value)) {
                 key = utils.underlineToHump(key);
-                const subInterface = optimizeTypeStructure(target, value, map);
+                const subInterface = optimizeTypeStructure(target, value, map, cacheTypesName);
                 map.unshift(subInterface);
                 const subInterfaceTarget = target.find((_) => _.hash === value);
                 if (subInterfaceTarget) {
