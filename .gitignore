@@ -7,4 +7,4 @@ node_modules
 publish.sh
 
 example/playground.ts
-playground/pnpm-lock.sh
+playground/pnpm-lock.yaml
