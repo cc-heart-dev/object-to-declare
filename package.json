@@ -22,7 +22,7 @@
     ".": [
       {
         "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.cjs",
+        "require": "./dist/cjs/index.js",
         "types": "./dist/types/src/index.d.ts"
       }
     ]
