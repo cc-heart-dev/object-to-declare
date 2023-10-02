@@ -4,7 +4,7 @@
   "description": "object2declare",
   "type": "module",
   "main": "./dist/cjs/index.cjs",
-  "types": "dist/types/src/index.d.ts",
+  "types": "./dist/types/src/index.d.ts",
   "scripts": {
     "debug": "ts-node-esm index.ts --inspect-brk=8888",
     "test": "vitest",
