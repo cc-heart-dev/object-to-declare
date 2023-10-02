@@ -1,6 +1,6 @@
 import { underlineToHump } from '@cc-heart/utils'
-import { ITypeStruct, TypeGroup } from './helper'
-import { isHash } from './utils'
+import { ITypeStruct } from './helper'
+import { isJSON, parseInterface } from './utils'
 
 export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: Array<string>, cacheTypesName: Set<string> = new Set()) {
   let str = ''
@@ -13,19 +13,17 @@ export function optimizeTypeStructure(target: ITypeStruct[], hash: string, map: 
     cacheTypesName.add(name)
     str += `interface ${name} {\n`
     Object.entries(data.target).forEach(([key, value]) => {
-      if (value !== null && isHash(value)) {
+      if (value !== null && isJSON(value)) {
         key = underlineToHump(key)
         const subInterface = optimizeTypeStructure(target, value, map, cacheTypesName)
         map.unshift(subInterface)
 
         const subInterfaceTarget = target.find((_) => _.hash === value)
         if (subInterfaceTarget) {
-          const { name } = subInterfaceTarget
+          let { name } = subInterfaceTarget
+          name = parseInterface(name)
           let typeVal
           switch (subInterfaceTarget.type) {
-            case TypeGroup.Array:
-              typeVal = `${name}[]`
-              break
             default:
               typeVal = name
           }

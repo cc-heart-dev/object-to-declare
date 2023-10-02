@@ -18,12 +18,20 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "noImplicitReturns": false
   },
-  "exclude": ["test/**/*", "node_modules/**/*", "playground/**/*", "rollup.config.js", "vite.config.ts", "example/**/*"]
+  "exclude": [
+    "test/**/*",
+    "playground/**/*",
+    "rollup.config.js",
+    "vitest.config.ts",
+    "example/**/*",
+    "plugins/**/*",
+    "node_modules/**/*"
+  ]
 }

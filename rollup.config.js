@@ -4,6 +4,7 @@ import tsConfig from './tsconfig.build.json' assert { type: 'json' }
 delete tsConfig.compilerOptions.emitDeclarationOnly
 tsConfig.compilerOptions.noEmit = true
 tsConfig.compilerOptions.declaration = false
+
 export default {
   input: './src/index.ts',
   output: [
@@ -12,7 +13,7 @@ export default {
       format: 'esm',
     },
     {
-      file: 'dist/cjs/index.js',
+      file: 'dist/cjs/index.cjs',
       format: 'cjs',
     },
   ],

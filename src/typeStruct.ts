@@ -1,5 +1,5 @@
 import { isNull, isObject } from '@cc-heart/utils'
-import { getHashByObject } from './utils'
+import { getHashByObject, isValidPropertyName, parseInterface } from './utils'
 import { type ITypeStruct, TypeGroup } from './helper'
 
 export function getTypeGroup(target: unknown) {
@@ -8,7 +8,7 @@ export function getTypeGroup(target: unknown) {
   return TypeGroup.Primitive
 }
 
-export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '', type = TypeGroup.Object) {
+export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '', type = TypeGroup.Object, isRootName = false) {
   switch (getTypeGroup(targetObj)) {
     case TypeGroup.Array:
       const typeArrayStructList = (targetObj as Array<unknown>)
@@ -18,21 +18,29 @@ export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] 
         .filter((val, index, self) => self.indexOf(val) === index)
       switch (typeArrayStructList.length) {
         case 0:
-          return []
+          return `[]`
         case 1:
-          return typeArrayStructList.join(' | ')
+          return `${typeArrayStructList[0]}[]`
         default:
           return `(${typeArrayStructList.join(' | ')})[]`
       }
     case TypeGroup.Object:
       const target = getTypeOfObject(targetObj as object, typeStructList)
       const hash = getHashByObject(target)
-      typeStructList.push({
-        hash,
-        name,
-        target,
-        type,
-      })
+      const inter = typeStructList.find((val) => val.hash === hash)
+      if (!isRootName) name = parseInterface(name)
+      if (inter) {
+        if (type !== TypeGroup.Array) {
+          inter.name = `${inter.name}_${name}`
+        }
+      } else {
+        typeStructList.push({
+          hash,
+          name,
+          target,
+          type,
+        })
+      }
       return hash
     case TypeGroup.Primitive:
       return getTypeOfPrimitive(targetObj)
@@ -43,6 +51,11 @@ function getTypeOfObject<T extends object>(targetObj: T, typeStructList: ITypeSt
   return Object.entries(targetObj).reduce(
     (acc, [key, value]) => {
       // object array primitive
+      if (!isValidPropertyName(key)) {
+        key = `'${key}'`
+      } else {
+        key = key
+      }
       acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object)
       return acc
     },

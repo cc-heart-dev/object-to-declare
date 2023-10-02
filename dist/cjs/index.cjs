@@ -2,17 +2,6 @@
 
 var utils = require('@cc-heart/utils');
 
-function covertToInterface(target) {
-    return target.replaceAll(/"|,/g, '');
-}
-
-var TypeGroup;
-(function (TypeGroup) {
-    TypeGroup[TypeGroup["Primitive"] = 0] = "Primitive";
-    TypeGroup[TypeGroup["Array"] = 1] = "Array";
-    TypeGroup[TypeGroup["Object"] = 2] = "Object";
-})(TypeGroup || (TypeGroup = {}));
-
 function isArrayObject(target) {
     return Array.isArray(target) && target.reduce((acc, cur) => acc && utils.isObject(cur), true);
 }
@@ -20,7 +9,7 @@ function getHashByObject(obj) {
     const hash = JSON.stringify(obj);
     return hash;
 }
-function isHash(target) {
+function isJSON(target) {
     try {
         const hash = JSON.parse(target);
         return hash !== null && !Array.isArray(hash);
@@ -28,6 +17,20 @@ function isHash(target) {
     catch {
         return false;
     }
+}
+function isValidPropertyName(name) {
+    // 是否是合法的属性名字
+    return /^[a-zA-Z0-9]*$/.test(name);
+}
+function isValidInterfaceName(name) {
+    return /^[a-zA-z0-9_]*$/.test(name);
+}
+function parseInterface(name) {
+    return name
+        .split('_')
+        .map((_) => utils.capitalize(_))
+        .map((_) => (!isValidInterfaceName(_) ? '__Valid' : _))
+        .join('_');
 }
 
 function optimizeTypeStructure(target, hash, map, cacheTypesName = new Set()) {
@@ -41,18 +44,16 @@ function optimizeTypeStructure(target, hash, map, cacheTypesName = new Set()) {
         cacheTypesName.add(name);
         str += `interface ${name} {\n`;
         Object.entries(data.target).forEach(([key, value]) => {
-            if (value !== null && isHash(value)) {
+            if (value !== null && isJSON(value)) {
                 key = utils.underlineToHump(key);
                 const subInterface = optimizeTypeStructure(target, value, map, cacheTypesName);
                 map.unshift(subInterface);
                 const subInterfaceTarget = target.find((_) => _.hash === value);
                 if (subInterfaceTarget) {
-                    const { name } = subInterfaceTarget;
+                    let { name } = subInterfaceTarget;
+                    name = parseInterface(name);
                     let typeVal;
                     switch (subInterfaceTarget.type) {
-                        case TypeGroup.Array:
-                            typeVal = `${name}[]`;
-                            break;
                         default:
                             typeVal = name;
                     }
@@ -80,6 +81,13 @@ function output(target, rootName, rootIsArray) {
     }, '');
 }
 
+var TypeGroup;
+(function (TypeGroup) {
+    TypeGroup[TypeGroup["Primitive"] = 0] = "Primitive";
+    TypeGroup[TypeGroup["Array"] = 1] = "Array";
+    TypeGroup[TypeGroup["Object"] = 2] = "Object";
+})(TypeGroup || (TypeGroup = {}));
+
 function getTypeGroup(target) {
     if (Array.isArray(target))
         return TypeGroup.Array;
@@ -87,7 +95,7 @@ function getTypeGroup(target) {
         return TypeGroup.Object;
     return TypeGroup.Primitive;
 }
-function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGroup.Object) {
+function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGroup.Object, isRootName = false) {
     switch (getTypeGroup(targetObj)) {
         case TypeGroup.Array:
             const typeArrayStructList = targetObj
@@ -97,21 +105,31 @@ function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGro
                 .filter((val, index, self) => self.indexOf(val) === index);
             switch (typeArrayStructList.length) {
                 case 0:
-                    return [];
+                    return `[]`;
                 case 1:
-                    return typeArrayStructList.join(' | ');
+                    return `${typeArrayStructList[0]}[]`;
                 default:
                     return `(${typeArrayStructList.join(' | ')})[]`;
             }
         case TypeGroup.Object:
             const target = getTypeOfObject(targetObj, typeStructList);
             const hash = getHashByObject(target);
-            typeStructList.push({
-                hash,
-                name,
-                target,
-                type,
-            });
+            const inter = typeStructList.find((val) => val.hash === hash);
+            if (!isRootName)
+                name = parseInterface(name);
+            if (inter) {
+                if (type !== TypeGroup.Array) {
+                    inter.name = `${inter.name}_${name}`;
+                }
+            }
+            else {
+                typeStructList.push({
+                    hash,
+                    name,
+                    target,
+                    type,
+                });
+            }
             return hash;
         case TypeGroup.Primitive:
             return getTypeOfPrimitive(targetObj);
@@ -120,6 +138,12 @@ function getTypeStruct(targetObj, typeStructList = [], name = '', type = TypeGro
 function getTypeOfObject(targetObj, typeStructList) {
     return Object.entries(targetObj).reduce((acc, [key, value]) => {
         // object array primitive
+        if (!isValidPropertyName(key)) {
+            key = `'${key}'`;
+        }
+        else {
+            key = key;
+        }
         acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object);
         return acc;
     }, {});
@@ -139,8 +163,8 @@ function generateTypeDeclaration(target, options = {}) {
     }
     const newOption = { ...defaultOptions, ...options };
     const typeStructList = [];
-    getTypeStruct(target, typeStructList, newOption.rootName);
-    return covertToInterface(output(typeStructList, newOption.rootName, Array.isArray(target)));
+    getTypeStruct(target, typeStructList, newOption.rootName, TypeGroup.Object, true);
+    return output(typeStructList, newOption.rootName, Array.isArray(target));
 }
 
 module.exports = generateTypeDeclaration;

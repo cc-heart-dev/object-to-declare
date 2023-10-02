@@ -1,6 +1,7 @@
 import { expect, describe, it } from 'vitest'
 import { JsonToTSOptions } from '../src/helper'
 import generateTypeDeclaration from '../src/index'
+
 describe('Common interface', () => {
   it('should be defined', () => {
     const target = {
@@ -51,13 +52,12 @@ describe('Common interface', () => {
         url: 'https',
       },
     }
-    console.log('target', generateTypeDeclaration(target))
     expect(generateTypeDeclaration(target)).toEqual(`interface IRootName {
-  sign: sign
-  lotto: sign
+  sign: Sign_Lotto
+  lotto: Sign_Lotto
 }
 
-interface sign {
+interface Sign_Lotto {
   url: string
 }`)
   })
@@ -77,22 +77,6 @@ interface IRootName {
   value: number
 }`)
   })
-
-  it('should return defined', () => {
-    const target = {
-      sign: { url: 'https://' },
-      lotto: { url: 'http://' }
-    }
-    expect(generateTypeDeclaration(target)).toEqual(`interface IRootName {
-  sign: sign
-  lotto: sign
-}
-
-interface sign {
-  url: string
-}`)
-  })
-
 })
 
 describe('object to declare', () => {
@@ -110,9 +94,9 @@ describe('object to declare', () => {
     }
     expect(generateTypeDeclaration(target)).toEqual(
       `interface IRootName {
-  mysql: mysql
+  mysql: Mysql
 }
-interface mysql {
+interface Mysql {
   type: string
   database: string
   username: string
@@ -122,5 +106,42 @@ interface mysql {
   port: number
 }`,
     )
+  })
+})
+
+describe('object container array', () => {
+  it('should return two interface when target is complex object', () => {
+    const target = {
+      data: [{ a: 1 }, { b: 2 }, { c: 3 }],
+      num: 1,
+      foo: {
+        bar: 2,
+      },
+      result: [1, 2, 3],
+      empty: [],
+    }
+    expect(generateTypeDeclaration(target)).toBe(`interface IRootName {
+  data: ({"a":"number"} | {"b":"number"} | {"c":"number"})[]
+  num: number
+  foo: Foo
+  result: number[]
+  empty: []
+}
+interface Foo {
+  bar: number
+}`)
+  })
+})
+
+describe('valid property name', () => {
+  it('should return true when invoke isJSON func', () => {
+    const target = {
+      200: 123,
+      'foo-bar': 123,
+    }
+    expect(generateTypeDeclaration(target)).toBe(`interface IRootName {
+  200: number
+  'foo-bar': number
+}`)
   })
 })

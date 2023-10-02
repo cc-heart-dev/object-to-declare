@@ -8,3 +8,5 @@ publish.sh
 
 example/playground.ts
 playground/pnpm-lock.yaml
+
+coverage
