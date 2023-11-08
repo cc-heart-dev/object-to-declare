@@ -1,5 +1,5 @@
 import { Splitpanes, Pane } from 'splitpanes'
-import { Ref, watch, defineComponent, ref } from 'vue'
+import { Ref, watch, defineComponent, ref, onMounted, onUnmounted } from 'vue'
 import '@/assets/scss/components/playground/playground.scss'
 import CodeMirror from '@/components/codeMirror/index.vue'
 import Card from '@/components/Card/Container'
@@ -11,6 +11,7 @@ export default defineComponent({
   name: 'Playground',
   setup() {
     const script = ref('')
+    const isMobileRef = ref(isMobileWidth())
     const typeInstanceRef = ref<{ clear: fn; setValue: fn } | null>(null)
     const typeDeclaration = ref<string | null>(null)
     const handleChange = (event: string, refs: Ref<string>) => {
@@ -36,14 +37,32 @@ export default defineComponent({
         func(data)
       },
     )
+    function isMobileWidth() {
+      return window.innerWidth <= 768
+    }
+
+    const listenerViewPortWidthChange = useDebounce(() => {
+      isMobileRef.value = isMobileWidth()
+    }, 300)
+
+    onMounted(() => {
+      window.addEventListener('resize', listenerViewPortWidthChange)
+    })
+    onUnmounted(() => {
+      window.removeEventListener('resize', listenerViewPortWidthChange)
+    })
+
+
     return () => (
       <div class="p-3 flex-1 overflow-auto">
-        <Splitpanes class="default-theme">
+        <Splitpanes class="default-theme" horizontal={isMobileRef.value}>
           <Pane>
             <Splitpanes class="default-theme" horizontal>
               <Pane>
                 <Card v-slots={{ title: () => 'input object or array object' }}>
-                  <CodeMirror value={script.value} lang="javascript" onChange={(e) => handleChange(e, script)} />
+                  {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                  {/* @ts-ignore */}
+                  <CodeMirror value={script.value} lang="javascript" onChange={(e:string) => handleChange(e, script)} />
                 </Card>
               </Pane>
             </Splitpanes>
@@ -60,7 +79,7 @@ export default defineComponent({
             >
               <CodeMirror
                 ref={typeInstanceRef}
-                // value={typeDeclaration.value}
+              // value={typeDeclaration.value}
               />
             </Card>
           </Pane>
