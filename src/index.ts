@@ -1,9 +1,9 @@
 import { isObject } from '@cc-heart/utils'
+import { TypeGroup, type ITypeStruct, type JsonToTSOptions } from './helper'
 import { output } from './output'
 import { getTypeStruct } from './typeStruct'
 import { isArrayObject } from './utils'
-import { TypeGroup } from './helper'
-import type { ITypeStruct, JsonToTSOptions } from './helper'
+
 export default function generateTypeDeclaration(target: unknown, options: JsonToTSOptions = {}) {
   const defaultOptions = {
     rootName: 'IRootName',
