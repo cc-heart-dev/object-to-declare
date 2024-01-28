@@ -7,7 +7,6 @@ import { Pane, Splitpanes } from 'splitpanes'
 import { Ref, defineComponent, onMounted, onUnmounted, ref, unref, watch } from 'vue'
 import { CodeMirrorExpose } from '../codeMirror/helper'
 
-type fn = (...args: any) => any
 export default defineComponent({
   name: 'Playground',
   setup() {
