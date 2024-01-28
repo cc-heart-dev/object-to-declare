@@ -1,10 +1,11 @@
-import { Splitpanes, Pane } from 'splitpanes'
-import { Ref, watch, defineComponent, ref, onMounted, onUnmounted } from 'vue'
 import '@/assets/scss/components/playground/playground.scss'
-import CodeMirror from '@/components/codeMirror/index.vue'
 import Card from '@/components/Card/Container'
+import CodeMirror from '@/components/codeMirror/index.vue'
 import { useDebounce } from '@/hooks/useDebounce'
 import generateTypeDeclaration from '@cc-heart/object-to-declare'
+import { Pane, Splitpanes } from 'splitpanes'
+import { Ref, defineComponent, onMounted, onUnmounted, ref, unref, watch } from 'vue'
+import { CodeMirrorExpose } from '../codeMirror/helper'
 
 type fn = (...args: any) => any
 export default defineComponent({
@@ -12,7 +13,8 @@ export default defineComponent({
   setup() {
     const script = ref('')
     const isMobileRef = ref(isMobileWidth())
-    const typeInstanceRef = ref<{ clear: fn; setValue: fn } | null>(null)
+    const typeInstanceRef = ref<CodeMirrorExpose>()
+    const rootName = ref('RootName')
     const typeDeclaration = ref<string | null>(null)
     const handleChange = (event: string, refs: Ref<string>) => {
       refs.value = event
@@ -21,7 +23,9 @@ export default defineComponent({
     const func = useDebounce((data) => {
       try {
         const target = new Function(`return ${data.trim()}`)()
-        typeDeclaration.value = generateTypeDeclaration(target)
+        typeDeclaration.value = generateTypeDeclaration(target, {
+          rootName: unref(rootName),
+        })
         typeInstanceRef.value?.clear()
         typeInstanceRef.value?.setValue(typeDeclaration.value)
       } catch (e) {
@@ -32,8 +36,8 @@ export default defineComponent({
     }, 500)
 
     watch(
-      () => script.value,
-      (data) => {
+      () => [script.value, rootName.value],
+      ([data]) => {
         func(data)
       },
     )
@@ -45,6 +49,10 @@ export default defineComponent({
       isMobileRef.value = isMobileWidth()
     }, 300)
 
+    const handleChangeRootName = (e: Event) => {
+      rootName.value = (e.target as HTMLInputElement).value
+    }
+
     onMounted(() => {
       window.addEventListener('resize', listenerViewPortWidthChange)
     })
@@ -52,17 +60,25 @@ export default defineComponent({
       window.removeEventListener('resize', listenerViewPortWidthChange)
     })
 
-
     return () => (
       <div class="p-3 flex-1 overflow-auto">
         <Splitpanes class="default-theme" horizontal={isMobileRef.value}>
           <Pane>
             <Splitpanes class="default-theme" horizontal>
               <Pane>
-                <Card v-slots={{ title: () => 'input object or array object' }}>
-                  {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                  {/* @ts-ignore */}
-                  <CodeMirror value={script.value} lang="javascript" onChange={(e:string) => handleChange(e, script)} />
+                <Card
+                  v-slots={{
+                    title: () => (
+                      <div class="flex justify-between">
+                        <div>input object or array object</div>
+                        <div>
+                          <input value={rootName.value} onChange={(e: Event) => handleChangeRootName(e)} />
+                        </div>
+                      </div>
+                    ),
+                  }}
+                >
+                  <CodeMirror value={script.value} lang="javascript" onChange={(e: string) => handleChange(e, script)} />
                 </Card>
               </Pane>
             </Splitpanes>
@@ -77,10 +93,7 @@ export default defineComponent({
                 ),
               }}
             >
-              <CodeMirror
-                ref={typeInstanceRef}
-              // value={typeDeclaration.value}
-              />
+              <CodeMirror ref={(e: unknown) => (typeInstanceRef.value = e as CodeMirrorExpose)} />
             </Card>
           </Pane>
         </Splitpanes>

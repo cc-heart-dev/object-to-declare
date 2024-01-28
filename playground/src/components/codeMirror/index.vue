@@ -3,10 +3,8 @@
     <div ref="codeRef"></div>
     <button class="copy-btn" :class="[isCopyCodeState ? 'copy-btn-copied' : '']" @click="copyCode">
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
-        <path
-          fill="currentColor"
-          d="M216 34H88a6 6 0 0 0-6 6v42H40a6 6 0 0 0-6 6v128a6 6 0 0 0 6 6h128a6 6 0 0 0 6-6v-42h42a6 6 0 0 0 6-6V40a6 6 0 0 0-6-6Zm-54 176H46V94h116Zm48-48h-36V88a6 6 0 0 0-6-6H94V46h116Z"
-        />
+        <path fill="currentColor"
+          d="M216 34H88a6 6 0 0 0-6 6v42H40a6 6 0 0 0-6 6v128a6 6 0 0 0 6 6h128a6 6 0 0 0 6-6v-42h42a6 6 0 0 0 6-6V40a6 6 0 0 0-6-6Zm-54 176H46V94h116Zm48-48h-36V88a6 6 0 0 0-6-6H94V46h116Z" />
       </svg>
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
         <path fill="currentColor" d="M18.9 8.1L9 18l-4.95-4.95l.71-.71L9 16.59l9.19-9.2l.71.71Z" />
@@ -16,21 +14,18 @@
 </template>
 
 <script setup lang="ts">
-import { EditorView, basicSetup } from 'codemirror'
+import { isDark } from '@/configs/index'
+import { usePrefixCls } from '@/hooks'
+import { copy } from '@cc-heart/utils-client'
 import { css } from '@codemirror/lang-css'
 import { html } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { isDark } from '@/configs/index'
+import { EditorView, basicSetup } from 'codemirror'
 import { onMounted, reactive, ref, watch } from 'vue'
-import { copy } from '@cc-heart/utils-client'
-import { usePrefixCls } from '@/hooks'
-interface IProps {
-  isReadonly?: boolean
-  lang?: 'javascript' | 'css' | 'html' | 'json'
-  value?: string
-}
+import { IProps } from './helper'
+
 const props = withDefaults(defineProps<IProps>(), {
   isReadonly: false,
   lang: 'javascript',
@@ -77,8 +72,6 @@ switch (props.lang) {
     lang = () => css()
     break
   case 'html':
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     lang = () => html()
     break
   case 'json':
@@ -122,7 +115,13 @@ onMounted(() => {
 watch(
   () => val.value,
   (data) => {
-    if (val.value !== props.value) emits('change', data)
+    if (val.value !== props.value) {
+      if (props.onChange instanceof Function) {
+        props.onChange(data)
+      } else {
+        emits('change', data)
+      }
+    }
   },
 )
 
@@ -165,16 +164,19 @@ defineExpose({
   --btn-color-hover: rgb(17, 24, 30);
   --border-color: rgba(31, 35, 40, 0.15);
   --border-color-hover: rgba(31, 35, 40, 0.3);
+
   &:hover {
     .copy-btn {
       opacity: 1;
       pointer-events: all;
     }
   }
+
   flex: 1;
   overflow: hidden;
   position: relative;
-  & > div {
+
+  &>div {
     width: 100%;
     height: 100%;
   }
@@ -227,16 +229,20 @@ defineExpose({
   border-radius: 0.375rem;
   border: 1px solid var(--border-color);
   transition: all 0.28s;
+
   &:hover {
     border-color: var(--border-color-hover);
     color: var(--btn-color-hover);
   }
+
   svg {
     padding: 0.375rem;
     vertical-align: middle;
+
     &:nth-child(1) {
       opacity: 1;
     }
+
     &:nth-child(2) {
       position: absolute;
       left: 0;
@@ -249,6 +255,7 @@ defineExpose({
       &:nth-child(1) {
         opacity: 0;
       }
+
       &:nth-child(2) {
         opacity: 1;
       }

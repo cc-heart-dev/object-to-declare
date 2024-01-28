@@ -1,29 +1,32 @@
-import * as vscode from 'vscode';
-import { join } from 'path';
-import * as ObjectToDeclare from '@cc-heart/object-to-declare';
-const generateTypeDeclaration = ObjectToDeclare as unknown as typeof ObjectToDeclare.default;
+import * as vscode from 'vscode'
+import { join } from 'path'
+import * as ObjectToDeclare from '@cc-heart/object-to-declare'
+const generateTypeDeclaration = ObjectToDeclare as unknown as typeof ObjectToDeclare.default
 export default class InputProvider implements vscode.WebviewViewProvider {
-  private webView?: vscode.WebviewView;
-  constructor(private readonly context: vscode.ExtensionContext) {
-  }
-  resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
+  private webView?: vscode.WebviewView
+  constructor(private readonly context: vscode.ExtensionContext) {}
+  resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext<unknown>,
+    token: vscode.CancellationToken,
+  ): void | Thenable<void> {
     if (!this.webView) {
-      this.webView = webviewView;
+      this.webView = webviewView
       this.webView.webview.options = {
         enableScripts: true,
-      };
+      }
       this.webView.webview.onDidReceiveMessage((e) => {
         try {
-          const code = new Function(`return ${e.text.trim()}`)();
+          const code = new Function(`return ${e.text.trim()}`)()
           this.webView?.webview.postMessage({
             data: generateTypeDeclaration(code),
-          });
+          })
         } catch (e) {
-          console.error(e);
+          console.error(e)
         }
-      });
+      })
     }
-    webviewView.webview.html = this.getHtml();
+    webviewView.webview.html = this.getHtml()
   }
   private getHtml(code?: string) {
     return `<!DOCTYPE html>
@@ -53,7 +56,7 @@ export default class InputProvider implements vscode.WebviewViewProvider {
     <body>
       <pre id="code">
       <!-- highlight code -->
-       ${code || ""}
+       ${code || ''}
       </pre>
       <textarea id="input" cols="20" rows="10"></textarea>
       <button id="explore">解析</button>
@@ -78,7 +81,6 @@ export default class InputProvider implements vscode.WebviewViewProvider {
         window.addEventListener('message', onMessage)
     </script>
     </html>
-    `;
+    `
   }
-
 }
