@@ -1,11 +1,32 @@
-import { type JsonToTSOptions } from './helper'
-import { getTypeStruct, parseTypeStruct } from './typeStruct.js'
+import { TypeStructTree, type JsonToTSOptions } from './helper'
+import { generatorTypeStructTree } from './parse.js'
+import { inspect } from 'util'
 export default function generateTypeDeclaration(target: unknown, options: JsonToTSOptions = {}) {
   const defaultOptions = {
     rootName: 'IRootName',
   }
 
-  const newOption = { ...defaultOptions, ...options }
-  const structAst = getTypeStruct(target, newOption.rootName)
-  return parseTypeStruct(structAst)
+  options = { ...defaultOptions, ...options }
+
+  const typeStructTreeMap = new Map<string, TypeStructTree>()
+  const val = generatorTypeStructTree(target, options.rootName, typeStructTreeMap)
+
+  console.log(inspect(typeStructTreeMap, { showHidden: false, depth: null }))
+  return val
+  // const typeMap = new Map<>
+  // const structAst = getTypeStruct(target, options.rootName)
+  // return parseTypeStruct(structAst)
 }
+
+const complexData: Record<string, any> = {
+  friends: [
+    {
+      hobbies: ['Swimming', 'Painting', 1]
+    },
+    {
+      hobbies: ['Hiking', 'Photography']
+    }
+  ]
+};
+
+inspect(generateTypeDeclaration(complexData), { showHidden: false, depth: null })

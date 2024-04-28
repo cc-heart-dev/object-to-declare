@@ -5,8 +5,8 @@ export const enum TypeGroup {
   Null,
   Undefined,
   Array,
-  Object
-
+  Object,
+  Union
 }
 
 export interface JsonToTSOptions {
@@ -18,4 +18,10 @@ export interface ITypeStruct {
   type: TypeGroup,
   declares?: 'type' | 'interface'
   target?: ITypeStruct[]
+}
+
+export interface TypeStructTree {
+  field: string
+  type: TypeGroup[]
+  children?: TypeStructTree[]
 }
