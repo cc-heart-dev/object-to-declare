@@ -6,7 +6,7 @@
   "main": "./dist/cjs/index.cjs",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "debug": "ts-node-esm index.ts --inspect-brk=8888",
+    "debug": "node --loader ts-node/esm src/index.ts --inspect-brk=8888",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "prettier": "npx prettier --write .",

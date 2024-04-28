@@ -1,69 +1,89 @@
-import { isNull, isObject } from '@cc-heart/utils'
-import { getHashByObject, isValidPropertyName, parseInterface } from './utils'
-import { type ITypeStruct, TypeGroup } from './helper'
+import { isBool, isNumber, isObject, isStr, isUndef } from '@cc-heart/utils'
+import { TypeGroup, type ITypeStruct } from './helper'
 
 export function getTypeGroup(target: unknown) {
+  if (isStr(target)) return TypeGroup.String
+  if (isUndef(target)) return TypeGroup.Undefined
+  if (isNumber(target)) return TypeGroup.Number
+  if (isBool(target)) return TypeGroup.Boolean
   if (Array.isArray(target)) return TypeGroup.Array
   if (isObject(target)) return TypeGroup.Object
-  return TypeGroup.Primitive
+  return TypeGroup.Null
 }
 
-export function getTypeStruct(targetObj: unknown, typeStructList: ITypeStruct[] = [], name = '', type = TypeGroup.Object, isRootName = false) {
-  switch (getTypeGroup(targetObj)) {
-    case TypeGroup.Array:
-      const typeArrayStructList = (targetObj as Array<unknown>)
-        .map((val) => {
-          return getTypeStruct(val, typeStructList, name, TypeGroup.Array)
-        })
-        .filter((val, index, self) => self.indexOf(val) === index)
-      switch (typeArrayStructList.length) {
-        case 0:
-          return `[]`
-        case 1:
-          return `${typeArrayStructList[0]}[]`
-        default:
-          return `(${typeArrayStructList.join(' | ')})[]`
-      }
-    case TypeGroup.Object:
-      const target = getTypeOfObject(targetObj as object, typeStructList)
-      const hash = getHashByObject(target)
-      const inter = typeStructList.find((val) => val.hash === hash)
-      if (!isRootName) name = parseInterface(name)
-      if (inter) {
-        if (type !== TypeGroup.Array) {
-          inter.name = `${inter.name}_${name}`
-        }
-      } else {
-        typeStructList.push({
-          hash,
-          name,
-          target,
-          type,
-        })
-      }
-      return hash
-    case TypeGroup.Primitive:
-      return getTypeOfPrimitive(targetObj)
+const noFieldName = '__$$NO_FIELD_NAME$$__'
+
+export function getTypeStruct(target: unknown, field: string | symbol) {
+  const typeStruct: ITypeStruct = {
+    field,
+    type: TypeGroup.Null,
+    declares: 'type',
   }
+  switch (getTypeGroup(target)) {
+    case TypeGroup.String:
+      typeStruct.type = TypeGroup.String
+      break
+    case TypeGroup.Number:
+      typeStruct.type = TypeGroup.Number
+      break
+    case TypeGroup.Boolean:
+      typeStruct.type = TypeGroup.Boolean
+      break
+    case TypeGroup.Undefined:
+      typeStruct.type = TypeGroup.Undefined
+      break
+    case TypeGroup.Array:
+      typeStruct.type = TypeGroup.Array;
+      typeStruct.target = [];
+      (target as Array<unknown>).forEach(item => {
+        const children = getTypeStruct(item, noFieldName)
+        typeStruct.target.push(children)
+      })
+      break
+    case TypeGroup.Object:
+      typeStruct.declares = 'interface';
+      typeStruct.type = TypeGroup.Object;
+      typeStruct.target = [];
+      Object.keys(target as Record<string, unknown>).forEach(key => {
+        const children = getTypeStruct(target[key], key)
+        typeStruct.target.push(children)
+      })
+      break
+  }
+  return typeStruct
 }
 
-function getTypeOfObject<T extends object>(targetObj: T, typeStructList: ITypeStruct[]) {
-  return Object.entries(targetObj).reduce(
-    (acc, [key, value]) => {
-      // object array primitive
-      if (!isValidPropertyName(key)) {
-        key = `'${key}'`
-      } else {
-        key = key
-      }
-      acc[key] = getTypeStruct(value, typeStructList, key, TypeGroup.Object)
-      return acc
-    },
-    {} as Record<keyof T, string>,
-  )
-}
 
-function getTypeOfPrimitive(target: unknown) {
-  if (isNull(target)) return null
-  return typeof target
+export const parseTypeMapTsType = (typeStruct: ITypeStruct) => {
+  switch (typeStruct.type) {
+    case TypeGroup.String:
+      return 'string'
+    case TypeGroup.Number:
+      return 'number'
+
+    case TypeGroup.Boolean:
+      return 'boolean'
+
+    case TypeGroup.Undefined:
+      return 'undefined'
+
+    case TypeGroup.Array:
+      const arrayTypeStruct = [...new Set(typeStruct.target.map(target => {
+        return parseTypeMapTsType(target)
+      }))].join(' | ')
+
+      return `Array<${arrayTypeStruct}>`
+
+    case TypeGroup.Object:
+      const objectTypeStruct = typeStruct.target.map(target => {
+        return `\t${String(target.field)}: ${parseTypeMapTsType(target)}\n`
+      }).join('')
+      return `{\n${objectTypeStruct}}`
+  }
+  return 'null'
+
+}
+export const parseTypeStruct = (typeStruct: ITypeStruct, isRoot = false) => {
+  let value = parseTypeMapTsType(typeStruct)
+  return `${isRoot ? typeStruct.declares : ''} ${String(typeStruct.field)} = ${value}`
 }

@@ -1,7 +1,12 @@
-export enum TypeGroup {
-  Primitive,
+export const enum TypeGroup {
+  String,
+  Number,
+  Boolean,
+  Null,
+  Undefined,
   Array,
-  Object,
+  Object
+
 }
 
 export interface JsonToTSOptions {
@@ -9,8 +14,8 @@ export interface JsonToTSOptions {
 }
 
 export interface ITypeStruct {
-  hash: string
-  name?: string
-  type: TypeGroup
-  target: Record<string, string>
+  field: string | symbol
+  type: TypeGroup,
+  declares?: 'type' | 'interface'
+  target?: ITypeStruct[]
 }
