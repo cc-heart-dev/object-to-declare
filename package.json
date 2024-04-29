@@ -6,7 +6,7 @@
   "main": "./dist/cjs/index.cjs",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "debug": "ts-node-esm index.ts --inspect-brk=8888",
+    "debug": "node --loader ts-node/esm src/index.ts --inspect-brk=8888",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "prettier": "npx prettier --write .",
@@ -37,8 +37,10 @@
     "@vitest/coverage-v8": "^0.34.6",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
+    "rollup": "^4.17.1",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.2",
+    "typescript": "^5.4.5",
     "vite": "^4.4.9",
     "vitest": "^0.34.6"
   }

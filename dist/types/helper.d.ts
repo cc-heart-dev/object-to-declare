@@ -1,14 +1,17 @@
-export declare enum TypeGroup {
-    Primitive = 0,
-    Array = 1,
-    Object = 2
+export declare const enum TypeGroup {
+    String = 0,
+    Number = 1,
+    Boolean = 2,
+    Null = 3,
+    Undefined = 4,
+    Array = 5,
+    Object = 6,
+    Union = 7
 }
 export interface JsonToTSOptions {
     rootName?: string;
 }
-export interface ITypeStruct {
-    hash: string;
-    name?: string;
-    type: TypeGroup;
-    target: Record<string, string>;
+export interface TypeStructTree {
+    type: TypeGroup[];
+    children?: Map<string, TypeStructTree>;
 }
