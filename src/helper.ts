@@ -13,15 +13,7 @@ export interface JsonToTSOptions {
   rootName?: string
 }
 
-export interface ITypeStruct {
-  field: string | symbol
-  type: TypeGroup,
-  declares?: 'type' | 'interface'
-  target?: ITypeStruct[]
-}
-
 export interface TypeStructTree {
-  field: string
   type: TypeGroup[]
-  children?: TypeStructTree[]
+  children?: Map<string,TypeStructTree>
 }

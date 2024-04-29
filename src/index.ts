@@ -1,6 +1,6 @@
-import { TypeStructTree, type JsonToTSOptions } from './helper'
-import { generatorTypeStructTree } from './parse.js'
-import { inspect } from 'util'
+import { isObject } from '@cc-heart/utils'
+import { type JsonToTSOptions } from './helper'
+import { generatorTypeStructTree, parseTypeStructTreeToTsType } from './parse.js'
 export default function generateTypeDeclaration(target: unknown, options: JsonToTSOptions = {}) {
   const defaultOptions = {
     rootName: 'IRootName',
@@ -8,25 +8,8 @@ export default function generateTypeDeclaration(target: unknown, options: JsonTo
 
   options = { ...defaultOptions, ...options }
 
-  const typeStructTreeMap = new Map<string, TypeStructTree>()
-  const val = generatorTypeStructTree(target, options.rootName, typeStructTreeMap)
+  const typeStructTree = generatorTypeStructTree(target, options.rootName )
 
-  console.log(inspect(typeStructTreeMap, { showHidden: false, depth: null }))
-  return val
-  // const typeMap = new Map<>
-  // const structAst = getTypeStruct(target, options.rootName)
-  // return parseTypeStruct(structAst)
+  const declareType = isObject(target) ? 'interface' : 'type'
+  return `${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` + parseTypeStructTreeToTsType(typeStructTree)
 }
-
-const complexData: Record<string, any> = {
-  friends: [
-    {
-      hobbies: ['Swimming', 'Painting', 1]
-    },
-    {
-      hobbies: ['Hiking', 'Photography']
-    }
-  ]
-};
-
-inspect(generateTypeDeclaration(complexData), { showHidden: false, depth: null })
