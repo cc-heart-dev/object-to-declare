@@ -8,7 +8,7 @@ export default function generateTypeDeclaration(target: unknown, options: JsonTo
 
   options = { ...defaultOptions, ...options }
 
-  const typeStructTree = generatorTypeStructTree(target, options.rootName )
+  const typeStructTree = generatorTypeStructTree(target, options.rootName)
 
   const declareType = isObject(target) ? 'interface' : 'type'
   return `${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` + parseTypeStructTreeToTsType(typeStructTree)

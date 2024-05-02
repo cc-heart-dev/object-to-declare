@@ -6,7 +6,6 @@ export const enum TypeGroup {
   Undefined,
   Array,
   Object,
-  Union
 }
 
 export interface JsonToTSOptions {
@@ -15,5 +14,5 @@ export interface JsonToTSOptions {
 
 export interface TypeStructTree {
   type: TypeGroup[]
-  children?: Map<string,TypeStructTree>
+  children?: Map<string, TypeStructTree>
 }

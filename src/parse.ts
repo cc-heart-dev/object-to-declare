@@ -1,82 +1,96 @@
-import { isBool, isNumber, isObject, isStr, isUndef } from '@cc-heart/utils'
-import { TypeGroup, TypeStructTree } from "./helper"
+import { isNull } from '@cc-heart/utils'
+import { TypeGroup, TypeStructTree } from './helper'
 
 function parseValueMapTypeGroup(target: unknown) {
-  if (isStr(target)) return TypeGroup.String
-  if (isUndef(target)) return TypeGroup.Undefined
-  if (isNumber(target)) return TypeGroup.Number
-  if (isBool(target)) return TypeGroup.Boolean
+  const typeMap = {
+    string: TypeGroup.String,
+    undefined: TypeGroup.Undefined,
+    number: TypeGroup.Number,
+    boolean: TypeGroup.Boolean,
+    object: TypeGroup.Object,
+  }
+
+  const targetType = typeof target
   if (Array.isArray(target)) return TypeGroup.Array
-  if (isObject(target)) return TypeGroup.Object
-  return TypeGroup.Null
+  if (isNull(target)) return TypeGroup.Null
+  return typeMap[targetType]
 }
 
+function mergeTreeType(currentType: TypeGroup, typeStructTree: TypeStructTree | undefined) {
+  return [...typeStructTree.type, currentType]
+}
 
-export function generatorTypeStructTree(target: unknown, field: string, parentTreeMap?: Map<string, TypeStructTree>) {
+// 递归 children 生成类型
+function recursiveChildrenGenerateType(target: unknown, field: string, typeStructTree: TypeStructTree) {
+  const children = generatorTypeStructTree(target, field, typeStructTree.children)
+  const existChildrenTarget = typeStructTree.children.get(field)
+  if (!existChildrenTarget) {
+    typeStructTree.children.set(field, children)
+  } else {
+    existChildrenTarget.type = [...new Set([...children.type, ...existChildrenTarget.type])]
+  }
+}
+
+export function generatorTypeStructTree(target: unknown, field: string | symbol, parentTreeMap?: Map<string | symbol, TypeStructTree>) {
   let typeStructTree: TypeStructTree = parentTreeMap?.get(field) ?? {
     type: [],
   }
 
   switch (parseValueMapTypeGroup(target)) {
     case TypeGroup.String:
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.String]
+      typeStructTree.type = mergeTreeType(TypeGroup.String, typeStructTree)
       break
     case TypeGroup.Number:
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Number]
+      typeStructTree.type = mergeTreeType(TypeGroup.Number, typeStructTree)
       break
     case TypeGroup.Boolean:
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Boolean]
-      break
-    case TypeGroup.Null:
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Null]
+      typeStructTree.type = mergeTreeType(TypeGroup.Boolean, typeStructTree)
       break
     case TypeGroup.Undefined:
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Undefined]
+      typeStructTree.type = mergeTreeType(TypeGroup.Undefined, typeStructTree)
       break
     case TypeGroup.Array:
       if (!typeStructTree.children) {
         typeStructTree.children = new Map()
       }
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Array]
+      typeStructTree.type = mergeTreeType(TypeGroup.Array, typeStructTree)
 
-      const arrayField = `${field}_$$children`;
+      const arrayChildrenField = `${String(field)}__$$children`
 
-      (target as Array<unknown>).forEach(item => {
-        const children = generatorTypeStructTree(item, arrayField, typeStructTree.children)
-        const prevValue = typeStructTree.children.get(arrayField)
-        if (!prevValue) {
-          typeStructTree.children.set(arrayField, children)
-        } else {
-          prevValue.type = [...new Set([...children.type, ...prevValue.type])]
-        }
+      ;(target as Array<unknown>).forEach((item) => {
+        recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree)
       })
       break
     case TypeGroup.Object:
       if (parentTreeMap && !parentTreeMap.get(field)) {
         parentTreeMap.set(field, typeStructTree)
       }
+
       if (!typeStructTree.children) {
-        typeStructTree.children = new Map();
+        typeStructTree.children = new Map<string, TypeStructTree>()
       }
 
-      typeStructTree.type = [...(typeStructTree.type ?? []), TypeGroup.Object]
+      typeStructTree.type = mergeTreeType(TypeGroup.Object, typeStructTree)
 
-      Object.keys(target).forEach(key => {
-        let typeStructTreeChildren = generatorTypeStructTree(target[key], key, typeStructTree.children)
-        const prevValue = typeStructTree.children.get(key)
-        if (!prevValue) {
-          typeStructTree.children.set(key, typeStructTreeChildren)
-        } else {
-          prevValue.type = [...new Set([...typeStructTreeChildren.type, ...prevValue.type])]
-        }
+      Object.keys(target).forEach((key) => {
+        recursiveChildrenGenerateType(target[key], key, typeStructTree)
       })
       break
+    default:
+      typeStructTree.type = mergeTreeType(TypeGroup.Null, typeStructTree)
   }
   return typeStructTree
 }
 
-export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree) {
-  const valueList = typeStructTree.type.map(target => {
+function generateSpace(space: number) {
+  let ret = ''
+  for (let i = 0; i < space; i++) {
+    ret += '\t'
+  }
+  return ret
+}
+export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1) {
+  const valueList = typeStructTree.type.map((target) => {
     switch (target) {
       case TypeGroup.Boolean:
         return 'boolean'
@@ -88,15 +102,17 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree) {
         return 'undefined'
       case TypeGroup.Object:
         let val = '{'
+        const childrenObjectSpace = space + 1
         for (const [key, value] of typeStructTree.children) {
-          val += `\n\t${key}: ${parseTypeStructTreeToTsType(value)}`
+          val += `\n${generateSpace(space)}${String(key)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
         }
-        val += '\n}'
+        val += `\n${generateSpace(space - 1)}}`
         return val
       case TypeGroup.Array:
         let arrayVal = []
+        const childrenArraySpace = space + 1
         for (const [, value] of typeStructTree.children) {
-          arrayVal.push(parseTypeStructTreeToTsType(value))
+          arrayVal.push(parseTypeStructTreeToTsType(value, childrenArraySpace))
         }
         return `Array<${arrayVal.join(' | ')}>`
     }
