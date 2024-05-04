@@ -40,10 +40,7 @@ describe('generate type when target is object or primitive value', () => {
         name: 'Alice',
         details: {
           age: 25,
-          addresses: [
-            { city: 'New York', zip: 10001 },
-            { city: 'Los Angeles', zip: 90001 },
-          ],
+          addresses: null,
         },
       },
       {
@@ -61,16 +58,16 @@ describe('generate type when target is object or primitive value', () => {
 
     const result = generateTypeDeclaration(complexData)
     const expectedType = `type IRootName = Array<{
-\t\tid: number
-\t\tname: string
-\t\tdetails: {
-\t\t\tage: number
-\t\t\taddresses: Array<{
-\t\t\t\t\tcity: string
-\t\t\t\t\tzip: number
-\t\t\t\t}>
-\t\t}
-\t}>`
+\tid: number
+\tname: string
+\tdetails: {
+\t\tage: number
+\t\taddresses: null | Array<{
+\t\t\tcity: string
+\t\t\tzip: number
+\t\t}>
+\t}
+}>`
     expect(result.trim()).toEqual(expectedType.trim())
   })
 })

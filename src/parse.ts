@@ -57,9 +57,9 @@ export function generatorTypeStructTree(target: unknown, field: string | symbol,
 
       const arrayChildrenField = `${String(field)}__$$children`
 
-      ;(target as Array<unknown>).forEach((item) => {
-        recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree)
-      })
+        ; (target as Array<unknown>).forEach((item) => {
+          recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree)
+        })
       break
     case TypeGroup.Object:
       if (parentTreeMap && !parentTreeMap.get(field)) {
@@ -112,7 +112,8 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         let arrayVal = []
         const childrenArraySpace = space + 1
         for (const [, value] of typeStructTree.children) {
-          arrayVal.push(parseTypeStructTreeToTsType(value, childrenArraySpace))
+          const childrenSpace = typeof value === 'object' && value !== null ? space : childrenArraySpace
+          arrayVal.push(parseTypeStructTreeToTsType(value, childrenSpace))
         }
         return `Array<${arrayVal.join(' | ')}>`
     }
