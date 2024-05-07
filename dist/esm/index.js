@@ -1,19 +1,33 @@
-import { isStr, isUndef, isNumber, isBool, isObject } from '@cc-heart/utils';
+import { isNull, isObject } from '@cc-heart/utils';
 
 function parseValueMapTypeGroup(target) {
-    if (isStr(target))
-        return 0 /* TypeGroup.String */;
-    if (isUndef(target))
-        return 4 /* TypeGroup.Undefined */;
-    if (isNumber(target))
-        return 1 /* TypeGroup.Number */;
-    if (isBool(target))
-        return 2 /* TypeGroup.Boolean */;
+    const typeMap = {
+        string: 0 /* TypeGroup.String */,
+        undefined: 4 /* TypeGroup.Undefined */,
+        number: 1 /* TypeGroup.Number */,
+        boolean: 2 /* TypeGroup.Boolean */,
+        object: 6 /* TypeGroup.Object */,
+    };
+    const targetType = typeof target;
     if (Array.isArray(target))
         return 5 /* TypeGroup.Array */;
-    if (isObject(target))
-        return 6 /* TypeGroup.Object */;
-    return 3 /* TypeGroup.Null */;
+    if (isNull(target))
+        return 3 /* TypeGroup.Null */;
+    return typeMap[targetType];
+}
+function mergeTreeType(currentType, typeStructTree) {
+    return [...typeStructTree.type, currentType];
+}
+// 递归 children 生成类型
+function recursiveChildrenGenerateType(target, field, typeStructTree) {
+    const children = generatorTypeStructTree(target, field, typeStructTree.children);
+    const existChildrenTarget = typeStructTree.children.get(field);
+    if (!existChildrenTarget) {
+        typeStructTree.children.set(field, children);
+    }
+    else {
+        existChildrenTarget.type = [...new Set([...children.type, ...existChildrenTarget.type])];
+    }
 }
 function generatorTypeStructTree(target, field, parentTreeMap) {
     let typeStructTree = parentTreeMap?.get(field) ?? {
@@ -21,35 +35,25 @@ function generatorTypeStructTree(target, field, parentTreeMap) {
     };
     switch (parseValueMapTypeGroup(target)) {
         case 0 /* TypeGroup.String */:
-            typeStructTree.type = [...(typeStructTree.type ?? []), 0 /* TypeGroup.String */];
+            typeStructTree.type = mergeTreeType(0 /* TypeGroup.String */, typeStructTree);
             break;
         case 1 /* TypeGroup.Number */:
-            typeStructTree.type = [...(typeStructTree.type ?? []), 1 /* TypeGroup.Number */];
+            typeStructTree.type = mergeTreeType(1 /* TypeGroup.Number */, typeStructTree);
             break;
         case 2 /* TypeGroup.Boolean */:
-            typeStructTree.type = [...(typeStructTree.type ?? []), 2 /* TypeGroup.Boolean */];
-            break;
-        case 3 /* TypeGroup.Null */:
-            typeStructTree.type = [...(typeStructTree.type ?? []), 3 /* TypeGroup.Null */];
+            typeStructTree.type = mergeTreeType(2 /* TypeGroup.Boolean */, typeStructTree);
             break;
         case 4 /* TypeGroup.Undefined */:
-            typeStructTree.type = [...(typeStructTree.type ?? []), 4 /* TypeGroup.Undefined */];
+            typeStructTree.type = mergeTreeType(4 /* TypeGroup.Undefined */, typeStructTree);
             break;
         case 5 /* TypeGroup.Array */:
             if (!typeStructTree.children) {
                 typeStructTree.children = new Map();
             }
-            typeStructTree.type = [...(typeStructTree.type ?? []), 5 /* TypeGroup.Array */];
-            const arrayField = `${field}_$$children`;
-            target.forEach(item => {
-                const children = generatorTypeStructTree(item, arrayField, typeStructTree.children);
-                const prevValue = typeStructTree.children.get(arrayField);
-                if (!prevValue) {
-                    typeStructTree.children.set(arrayField, children);
-                }
-                else {
-                    prevValue.type = [...new Set([...children.type, ...prevValue.type])];
-                }
+            typeStructTree.type = mergeTreeType(5 /* TypeGroup.Array */, typeStructTree);
+            const arrayChildrenField = `${String(field)}__$$children`;
+            target.forEach((item) => {
+                recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree);
             });
             break;
         case 6 /* TypeGroup.Object */:
@@ -59,23 +63,25 @@ function generatorTypeStructTree(target, field, parentTreeMap) {
             if (!typeStructTree.children) {
                 typeStructTree.children = new Map();
             }
-            typeStructTree.type = [...(typeStructTree.type ?? []), 6 /* TypeGroup.Object */];
-            Object.keys(target).forEach(key => {
-                let typeStructTreeChildren = generatorTypeStructTree(target[key], key, typeStructTree.children);
-                const prevValue = typeStructTree.children.get(key);
-                if (!prevValue) {
-                    typeStructTree.children.set(key, typeStructTreeChildren);
-                }
-                else {
-                    prevValue.type = [...new Set([...typeStructTreeChildren.type, ...prevValue.type])];
-                }
+            typeStructTree.type = mergeTreeType(6 /* TypeGroup.Object */, typeStructTree);
+            Object.keys(target).forEach((key) => {
+                recursiveChildrenGenerateType(target[key], key, typeStructTree);
             });
             break;
+        default:
+            typeStructTree.type = mergeTreeType(3 /* TypeGroup.Null */, typeStructTree);
     }
     return typeStructTree;
 }
-function parseTypeStructTreeToTsType(typeStructTree) {
-    const valueList = typeStructTree.type.map(target => {
+function generateSpace(space) {
+    let ret = '';
+    for (let i = 0; i < space; i++) {
+        ret += '\t';
+    }
+    return ret;
+}
+function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
+    const valueList = typeStructTree.type.map((target) => {
         switch (target) {
             case 2 /* TypeGroup.Boolean */:
                 return 'boolean';
@@ -87,15 +93,18 @@ function parseTypeStructTreeToTsType(typeStructTree) {
                 return 'undefined';
             case 6 /* TypeGroup.Object */:
                 let val = '{';
+                const childrenObjectSpace = space + 1;
                 for (const [key, value] of typeStructTree.children) {
-                    val += `\n\t${key}: ${parseTypeStructTreeToTsType(value)}`;
+                    val += `\n${generateSpace(space)}${String(key)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`;
                 }
-                val += '\n}';
+                val += `\n${generateSpace(space - 1)}}`;
                 return val;
             case 5 /* TypeGroup.Array */:
                 let arrayVal = [];
+                const childrenArraySpace = space + 1;
                 for (const [, value] of typeStructTree.children) {
-                    arrayVal.push(parseTypeStructTreeToTsType(value));
+                    const childrenSpace = typeof value === 'object' && value !== null ? space : childrenArraySpace;
+                    arrayVal.push(parseTypeStructTreeToTsType(value, childrenSpace));
                 }
                 return `Array<${arrayVal.join(' | ')}>`;
         }

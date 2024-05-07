@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@cc-heart/eslint-config": "^0.0.5",
-    "@cc-heart/object-to-declare": "^1.2.1",
+    "@cc-heart/object-to-declare": "^1.2.2",
     "@cc-heart/utils": "^4.1.5",
     "@cc-heart/utils-client": "^0.0.12",
     "@codemirror/lang-css": "^6.2.1",

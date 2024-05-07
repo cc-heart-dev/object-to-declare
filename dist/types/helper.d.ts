@@ -5,8 +5,7 @@ export declare const enum TypeGroup {
     Null = 3,
     Undefined = 4,
     Array = 5,
-    Object = 6,
-    Union = 7
+    Object = 6
 }
 export interface JsonToTSOptions {
     rootName?: string;
