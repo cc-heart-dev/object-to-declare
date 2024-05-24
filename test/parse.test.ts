@@ -102,4 +102,23 @@ describe('parseTypeStructTreeToTsType', () => {
 
     expect(parseTypeStructTreeToTsType(typeStructTree)).toBe('Array<string | number>')
   })
+
+  it('should return single quotes wrapper key when the key does not conform to the JS specification', () => {
+    const typeStructTree = {
+      type: [TypeGroup.Object],
+      children: new Map([
+        ['nestedField 1', { type: [TypeGroup.String] }],
+        ['123asd', { type: [TypeGroup.Number] }],
+        ['asd_1', { type: [TypeGroup.Boolean] }],
+        ['asd_1__$1', { type: [TypeGroup.Undefined] }],
+      ]),
+    }
+
+    expect(parseTypeStructTreeToTsType(typeStructTree)).toBe(`{
+\t'nestedField 1': string
+\t'123asd': number
+\tasd_1: boolean
+\tasd_1__$1: undefined
+}`)
+  })
 })

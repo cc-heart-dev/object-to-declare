@@ -89,6 +89,15 @@ function generateSpace(space: number) {
   }
   return ret
 }
+
+export function parserKey(key: string) {
+  const validIdentifier = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+  if (validIdentifier.test(key))
+    return key
+
+  return `'${key}'`
+}
+
 export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1) {
   const valueList = typeStructTree.type.map((target) => {
     switch (target) {
@@ -104,7 +113,7 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         let val = '{'
         const childrenObjectSpace = space + 1
         for (const [key, value] of typeStructTree.children) {
-          val += `\n${generateSpace(space)}${String(key)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
+          val += `\n${generateSpace(space)}${parserKey(String(key))}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
         }
         val += `\n${generateSpace(space - 1)}}`
         return val
