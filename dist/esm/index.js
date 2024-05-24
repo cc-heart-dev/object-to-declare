@@ -80,6 +80,12 @@ function generateSpace(space) {
     }
     return ret;
 }
+function parserKey(key) {
+    const validIdentifier = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+    if (validIdentifier.test(key))
+        return key;
+    return `'${key}'`;
+}
 function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
     const valueList = typeStructTree.type.map((target) => {
         switch (target) {
@@ -95,7 +101,7 @@ function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
                 let val = '{';
                 const childrenObjectSpace = space + 1;
                 for (const [key, value] of typeStructTree.children) {
-                    val += `\n${generateSpace(space)}${String(key)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`;
+                    val += `\n${generateSpace(space)}${parserKey(String(key))}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`;
                 }
                 val += `\n${generateSpace(space - 1)}}`;
                 return val;

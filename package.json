@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/object-to-declare",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "object2declare",
   "type": "module",
   "main": "./dist/cjs/index.cjs",
@@ -18,7 +18,8 @@
   "keywords": [
     "object2declare"
   ],
-  "author": "carl chen",
+  "author": "Carl Chen",
+  "files": ["dist"],
   "license": "MIT",
   "exports": {
     ".": [
