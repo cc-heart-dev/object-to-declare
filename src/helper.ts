@@ -8,7 +8,7 @@ export const enum TypeGroup {
   Object,
 }
 
-export interface JsonToTSOptions {
+export interface ObjectToDtsOptions {
   rootName?: string
 }
 

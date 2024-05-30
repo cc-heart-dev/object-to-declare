@@ -1,7 +1,8 @@
 import { isObject } from '@cc-heart/utils'
-import { type JsonToTSOptions } from './helper'
+import { type ObjectToDtsOptions } from './helper'
 import { generatorTypeStructTree, parseTypeStructTreeToTsType } from './parse.js'
-export default function generateTypeDeclaration(target: unknown, options: JsonToTSOptions = {}) {
+
+export default function generateTypeDeclaration(target: unknown, options: ObjectToDtsOptions = {}) {
   const defaultOptions = {
     rootName: 'IRootName',
   }

@@ -28,7 +28,6 @@ export default defineComponent({
         typeInstanceRef.value?.clear()
         typeInstanceRef.value?.setValue(typeDeclaration.value)
       } catch (e) {
-        console.log(e)
         typeInstanceRef.value?.clear()
         typeInstanceRef.value?.setValue((e as Error).toString())
       }
@@ -69,9 +68,9 @@ export default defineComponent({
                   v-slots={{
                     title: () => (
                       <div class="flex justify-between">
-                        <div>input object or array object</div>
+                        <div>json</div>
                         <div>
-                          <input value={rootName.value} onChange={(e: Event) => handleChangeRootName(e)} />
+                          <input class="border-none p-x-1" value={rootName.value} onChange={(e: Event) => handleChangeRootName(e)} placeholder='RootName' />
                         </div>
                       </div>
                     ),
@@ -87,7 +86,7 @@ export default defineComponent({
               v-slots={{
                 title: () => (
                   <div class="flex w-full items-center justify-between">
-                    <span>output types</span>
+                    <span>DTS</span>
                   </div>
                 ),
               }}

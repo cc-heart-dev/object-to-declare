@@ -94,6 +94,7 @@ function updateTheme() {
       doc: props.value || val.value,
       dispatch(tr) {
         view.update([tr])
+        state.length = tr.state.doc.length
         val.value = view.state.doc.toString()
       },
     })
