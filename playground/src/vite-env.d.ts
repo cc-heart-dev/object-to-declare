@@ -10,8 +10,3 @@ declare module 'vue-i18n' {
   export * from 'node_modules/vue-i18n/dist/vue-i18n'
 }
 
-declare module '*.md' {
-  import type { ComponentOptions } from 'vue'
-  const Component: ComponentOptions
-  export default Component
-}

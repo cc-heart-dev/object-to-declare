@@ -3,7 +3,6 @@ import App from './App.vue'
 import 'uno.css'
 import '@/assets/scss/theme.scss'
 import './main.css'
-import './modules/i18n'
 // 标题
 import 'splitpanes/dist/splitpanes.css'
 
