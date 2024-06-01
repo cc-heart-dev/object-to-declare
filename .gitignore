@@ -11,3 +11,4 @@ playground/pnpm-lock.yaml
 
 coverage
 .idea
+dist
