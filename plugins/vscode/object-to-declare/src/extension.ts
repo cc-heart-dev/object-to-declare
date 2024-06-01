@@ -5,8 +5,8 @@ export function activate(context: vscode.ExtensionContext) {
   // 在插件加载完成后创建webview 为 textarea
   const view = vscode.window.registerWebviewViewProvider('object-to-declare.objectToDeclare', new TransformProvider(context), {
     webviewOptions: {
-      retainContextWhenHidden: true,
-    },
+      retainContextWhenHidden: true
+    }
   })
 
   context.subscriptions.push(view)

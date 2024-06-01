@@ -5,7 +5,7 @@ export default defineConfig({
     presetAttributify({
       /* preset options */
     }),
-    presetUno(),
+    presetUno()
     // ...custom presets
-  ],
+  ]
 })

@@ -5,7 +5,7 @@ import LocalRouters from '@/routes/index'
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [...LocalRouters, ...routes],
+  routes: [...LocalRouters, ...routes]
 })
 
 export const setup = ({ app }: { app: App }) => {

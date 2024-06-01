@@ -9,5 +9,5 @@ export default defineComponent({
         <router-view />
       </main>
     )
-  },
+  }
 })

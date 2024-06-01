@@ -20,9 +20,9 @@ describe('generate type when target is object or primitive value', () => {
         name: 'John',
         address: {
           city: 'New York',
-          zip: 12345,
-        },
-      },
+          zip: 12345
+        }
+      }
     }
     const result = generateTypeDeclaration(nestedObject)
     expect(result).toContain('interface IRootName')
@@ -40,8 +40,8 @@ describe('generate type when target is object or primitive value', () => {
         name: 'Alice',
         details: {
           age: 25,
-          addresses: null,
-        },
+          addresses: null
+        }
       },
       {
         id: 2,
@@ -50,10 +50,10 @@ describe('generate type when target is object or primitive value', () => {
           age: 30,
           addresses: [
             { city: 'Chicago', zip: 60601 },
-            { city: 'Houston', zip: 77001 },
-          ],
-        },
-      },
+            { city: 'Houston', zip: 77001 }
+          ]
+        }
+      }
     ]
 
     const result = generateTypeDeclaration(complexData)
@@ -72,11 +72,7 @@ describe('generate type when target is object or primitive value', () => {
   })
 
   test('should generate optional properties if not present in every object of array', () => {
-    const complexData = [
-      { a: 1 },
-      { b: '2' },
-      { c: false }
-    ]
+    const complexData = [{ a: 1 }, { b: '2' }, { c: false }]
 
     const result = generateTypeDeclaration(complexData)
     const expectedType = `type IRootName = Array<{

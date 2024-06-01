@@ -5,4 +5,3 @@ import Home from '@/layouts/home'
 <template>
   <Home />
 </template>
-

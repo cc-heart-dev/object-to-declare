@@ -8,18 +8,18 @@ export default class InputProvider implements vscode.WebviewViewProvider {
   resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext<unknown>,
-    token: vscode.CancellationToken,
+    token: vscode.CancellationToken
   ): void | Thenable<void> {
     if (!this.webView) {
       this.webView = webviewView
       this.webView.webview.options = {
-        enableScripts: true,
+        enableScripts: true
       }
       this.webView.webview.onDidReceiveMessage((e) => {
         try {
           const code = new Function(`return ${e.text.trim()}`)()
           this.webView?.webview.postMessage({
-            data: generateTypeDeclaration(code),
+            data: generateTypeDeclaration(code)
           })
         } catch (e) {
           console.error(e)

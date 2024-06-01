@@ -1,6 +1,26 @@
 'use strict';
 
-var utils = require('@cc-heart/utils');
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const _toString = Object.prototype.toString;
+/**
+ * Checks if the given value is an object.
+ *
+ * @param {unknown} val - The value to be checked.
+ * @return {boolean} Returns true if the value is an object, otherwise false.
+ */
+function isObject(val) {
+    return _toString.call(val) === '[object Object]';
+}
+/**
+ * Checks if the given value is null.
+ *
+ * @param {unknown} val - The value to check.
+ * @return {boolean} Returns true if the value is null, false otherwise.
+ */
+function isNull(val) {
+    return val === null;
+}
 
 function parseValueMapTypeGroup(target) {
     const typeMap = {
@@ -8,32 +28,44 @@ function parseValueMapTypeGroup(target) {
         undefined: 4 /* TypeGroup.Undefined */,
         number: 1 /* TypeGroup.Number */,
         boolean: 2 /* TypeGroup.Boolean */,
-        object: 6 /* TypeGroup.Object */,
+        object: 6 /* TypeGroup.Object */
     };
     const targetType = typeof target;
     if (Array.isArray(target))
         return 5 /* TypeGroup.Array */;
-    if (utils.isNull(target))
+    if (isNull(target))
         return 3 /* TypeGroup.Null */;
     return typeMap[targetType];
 }
 function mergeTreeType(currentType, typeStructTree) {
     return [...typeStructTree.type, currentType];
 }
-// 递归 children 生成类型
-function recursiveChildrenGenerateType(target, field, typeStructTree) {
-    const children = generatorTypeStructTree(target, field, typeStructTree.children);
-    const existChildrenTarget = typeStructTree.children.get(field);
+function recursiveChildrenGenerateType(target, field, typeStructTree, options) {
+    const children = generatorTypeStructTree(target, field, typeStructTree.children, options);
+    let existChildrenTarget = typeStructTree.children.get(field);
     if (!existChildrenTarget) {
         typeStructTree.children.set(field, children);
+        existChildrenTarget = children;
     }
     else {
         existChildrenTarget.type = [...new Set([...children.type, ...existChildrenTarget.type])];
     }
+    if (options && options.isArrayType) {
+        let count = 0;
+        if (!existChildrenTarget.__array_count) {
+            existChildrenTarget.__array_keys_map = new Map();
+        }
+        else {
+            count = existChildrenTarget.__array_keys_map.get(field);
+        }
+        count++;
+        existChildrenTarget.__array_keys_map.set(field, count);
+        existChildrenTarget.__array_count = options.length;
+    }
 }
-function generatorTypeStructTree(target, field, parentTreeMap) {
+function generatorTypeStructTree(target, field, parentTreeMap, options) {
     let typeStructTree = parentTreeMap?.get(field) ?? {
-        type: [],
+        type: []
     };
     switch (parseValueMapTypeGroup(target)) {
         case 0 /* TypeGroup.String */:
@@ -54,8 +86,12 @@ function generatorTypeStructTree(target, field, parentTreeMap) {
             }
             typeStructTree.type = mergeTreeType(5 /* TypeGroup.Array */, typeStructTree);
             const arrayChildrenField = `${String(field)}__$$children`;
-            target.forEach((item) => {
-                recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree);
+            target.forEach((item, _, arr) => {
+                recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
+                    ...options,
+                    isArrayType: true,
+                    length: arr.length
+                });
             });
             break;
         case 6 /* TypeGroup.Object */:
@@ -67,7 +103,7 @@ function generatorTypeStructTree(target, field, parentTreeMap) {
             }
             typeStructTree.type = mergeTreeType(6 /* TypeGroup.Object */, typeStructTree);
             Object.keys(target).forEach((key) => {
-                recursiveChildrenGenerateType(target[key], key, typeStructTree);
+                recursiveChildrenGenerateType(target[key], key, typeStructTree, options);
             });
             break;
         default:
@@ -88,6 +124,15 @@ function parserKey(key) {
         return key;
     return `'${key}'`;
 }
+function generateParticleType(field, typeStructTree) {
+    if (typeStructTree.__array_keys_map) {
+        const count = typeStructTree.__array_keys_map.get(field);
+        if (count === typeStructTree.__array_count)
+            return '';
+        return '?';
+    }
+    return '';
+}
 function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
     const valueList = typeStructTree.type.map((target) => {
         switch (target) {
@@ -103,7 +148,7 @@ function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
                 let val = '{';
                 const childrenObjectSpace = space + 1;
                 for (const [key, value] of typeStructTree.children) {
-                    val += `\n${generateSpace(space)}${parserKey(String(key))}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`;
+                    val += `\n${generateSpace(space)}${parserKey(String(key))}${generateParticleType(key, value)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`;
                 }
                 val += `\n${generateSpace(space - 1)}}`;
                 return val;
@@ -121,14 +166,17 @@ function parseTypeStructTreeToTsType(typeStructTree, space = 1) {
     return [...new Set(valueList)].join(' | ');
 }
 
+const version = '1.2.3';
+
 function generateTypeDeclaration(target, options = {}) {
     const defaultOptions = {
-        rootName: 'IRootName',
+        rootName: 'IRootName'
     };
     options = { ...defaultOptions, ...options };
     const typeStructTree = generatorTypeStructTree(target, options.rootName);
-    const declareType = utils.isObject(target) ? 'interface' : 'type';
+    const declareType = isObject(target) ? 'interface' : 'type';
     return `${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` + parseTypeStructTreeToTsType(typeStructTree);
 }
 
-module.exports = generateTypeDeclaration;
+exports.default = generateTypeDeclaration;
+exports.version = version;

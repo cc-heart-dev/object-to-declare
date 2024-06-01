@@ -30,12 +30,12 @@ import { IProps } from './helper'
 
 const props = withDefaults(defineProps<IProps>(), {
   isReadonly: false,
-  lang: 'javascript',
+  lang: 'javascript'
 })
 const val = ref('')
 
 const state = reactive({
-  length: 0,
+  length: 0
 })
 
 const codeRef = ref(null)
@@ -63,7 +63,7 @@ let view: EditorView
 let lang = () =>
   javascript({
     typescript: true,
-    jsx: true,
+    jsx: true
   })
 
 const emits = defineEmits<{
@@ -96,7 +96,7 @@ function updateTheme() {
         view.update([tr])
         state.length = tr.state.doc.length
         val.value = view.state.doc.toString()
-      },
+      }
     })
   } else {
     view = new EditorView({
@@ -107,7 +107,7 @@ function updateTheme() {
         view.update([tr])
         state.length = tr.state.doc.length
         val.value = view.state.doc.toString()
-      },
+      }
     })
   }
 }
@@ -125,7 +125,7 @@ watch(
         emits('change', data)
       }
     }
-  },
+  }
 )
 
 watch(
@@ -137,7 +137,7 @@ watch(
         val.value = data
       }
     }
-  },
+  }
 )
 
 function clear() {
@@ -154,7 +154,7 @@ function setValue(value: string) {
 defineExpose({
   clear,
   getValue,
-  setValue,
+  setValue
 })
 </script>
 

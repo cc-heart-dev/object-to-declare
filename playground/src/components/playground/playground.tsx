@@ -23,7 +23,7 @@ export default defineComponent({
       try {
         const target = new Function(`return ${data.trim()}`)()
         typeDeclaration.value = generateTypeDeclaration(target, {
-          rootName: unref(rootName),
+          rootName: unref(rootName)
         })
         typeInstanceRef.value?.clear()
         typeInstanceRef.value?.setValue(typeDeclaration.value)
@@ -37,7 +37,7 @@ export default defineComponent({
       () => [script.value, rootName.value],
       ([data]) => {
         func(data)
-      },
+      }
     )
     function isMobileWidth() {
       return window.innerWidth <= 768
@@ -70,10 +70,15 @@ export default defineComponent({
                       <div class="flex justify-between">
                         <div>json</div>
                         <div>
-                          <input class="border-none p-x-1" value={rootName.value} onChange={(e: Event) => handleChangeRootName(e)} placeholder='RootName' />
+                          <input
+                            class="border-none p-x-1"
+                            value={rootName.value}
+                            onChange={(e: Event) => handleChangeRootName(e)}
+                            placeholder="RootName"
+                          />
                         </div>
                       </div>
-                    ),
+                    )
                   }}
                 >
                   <CodeMirror value={script.value} lang="javascript" onChange={(e: string) => handleChange(e, script)} />
@@ -88,7 +93,7 @@ export default defineComponent({
                   <div class="flex w-full items-center justify-between">
                     <span>DTS</span>
                   </div>
-                ),
+                )
               }}
             >
               <CodeMirror ref={(e: unknown) => (typeInstanceRef.value = e as CodeMirrorExpose)} />
@@ -97,5 +102,5 @@ export default defineComponent({
         </Splitpanes>
       </div>
     )
-  },
+  }
 })

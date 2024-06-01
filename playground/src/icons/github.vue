@@ -10,6 +10,6 @@
 
 <script lang="ts">
 export default {
-  name: 'GrommetIconsGithub',
+  name: 'GrommetIconsGithub'
 }
 </script>

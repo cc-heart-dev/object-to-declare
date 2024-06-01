@@ -4,7 +4,7 @@ const myObject = {
   id: 1,
   name: 'John Smith',
   age: 30,
-  email: 'john.smith@example.com',
+  email: 'john.smith@example.com'
 }
 
 const typeDeclaration = generateTypeDeclaration(myObject)

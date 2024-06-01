@@ -7,7 +7,7 @@ function parseValueMapTypeGroup(target: unknown) {
     undefined: TypeGroup.Undefined,
     number: TypeGroup.Number,
     boolean: TypeGroup.Boolean,
-    object: TypeGroup.Object,
+    object: TypeGroup.Object
   }
 
   const targetType = typeof target
@@ -44,9 +44,14 @@ function recursiveChildrenGenerateType(target: unknown, field: string, typeStruc
   }
 }
 
-export function generatorTypeStructTree(target: unknown, field: string | symbol, parentTreeMap?: Map<string | symbol, TypeStructTree>, options?: GeneratorTypeStructTreeOptions) {
+export function generatorTypeStructTree(
+  target: unknown,
+  field: string | symbol,
+  parentTreeMap?: Map<string | symbol, TypeStructTree>,
+  options?: GeneratorTypeStructTreeOptions
+) {
   let typeStructTree: TypeStructTree = parentTreeMap?.get(field) ?? {
-    type: [],
+    type: []
   }
 
   switch (parseValueMapTypeGroup(target)) {
@@ -70,13 +75,13 @@ export function generatorTypeStructTree(target: unknown, field: string | symbol,
 
       const arrayChildrenField = `${String(field)}__$$children`
 
-        ; (target as Array<unknown>).forEach((item, _, arr) => {
-          recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
-            ...options,
-            isArrayType: true,
-            length: arr.length
-          })
+      ;(target as Array<unknown>).forEach((item, _, arr) => {
+        recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
+          ...options,
+          isArrayType: true,
+          length: arr.length
         })
+      })
       break
     case TypeGroup.Object:
       if (parentTreeMap && !parentTreeMap.get(field)) {
@@ -108,9 +113,8 @@ function generateSpace(space: number) {
 }
 
 export function parserKey(key: string) {
-  const validIdentifier = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
-  if (validIdentifier.test(key))
-    return key
+  const validIdentifier = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/
+  if (validIdentifier.test(key)) return key
 
   return `'${key}'`
 }
@@ -118,11 +122,9 @@ export function parserKey(key: string) {
 function generateParticleType(field: string, typeStructTree: TypeStructTree) {
   if (typeStructTree.__array_keys_map) {
     const count = typeStructTree.__array_keys_map.get(field)
-    if (count === typeStructTree.__array_count)
-      return ''
+    if (count === typeStructTree.__array_count) return ''
 
     return '?'
-
   }
   return ''
 }

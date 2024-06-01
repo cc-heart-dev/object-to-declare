@@ -4,7 +4,7 @@ import { generatorTypeStructTree, parseTypeStructTreeToTsType } from './parse.js
 
 export default function generateTypeDeclaration(target: unknown, options: ObjectToDtsOptions = {}) {
   const defaultOptions = {
-    rootName: 'IRootName',
+    rootName: 'IRootName'
   }
 
   options = { ...defaultOptions, ...options }
@@ -14,3 +14,5 @@ export default function generateTypeDeclaration(target: unknown, options: Object
   const declareType = isObject(target) ? 'interface' : 'type'
   return `${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` + parseTypeStructTreeToTsType(typeStructTree)
 }
+
+export * from './version'

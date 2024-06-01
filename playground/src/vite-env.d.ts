@@ -9,4 +9,3 @@ declare module '*.vue' {
 declare module 'vue-i18n' {
   export * from 'node_modules/vue-i18n/dist/vue-i18n'
 }
-

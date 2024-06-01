@@ -1,5 +1,9 @@
 import pluginTypescript from '@rollup/plugin-typescript'
-import tsConfig from './tsconfig.build.json' assert { type: 'json' }
+import resolve from '@rollup/plugin-node-resolve'
+import { readFileSync } from 'fs'
+
+let tsConfig = readFileSync('./tsconfig.build.json')
+tsConfig = JSON.parse(tsConfig)
 
 delete tsConfig.compilerOptions.emitDeclarationOnly
 tsConfig.compilerOptions.noEmit = true
@@ -10,12 +14,12 @@ export default {
   output: [
     {
       file: 'dist/esm/index.js',
-      format: 'esm',
+      format: 'esm'
     },
     {
       file: 'dist/cjs/index.cjs',
-      format: 'cjs',
-    },
+      format: 'cjs'
+    }
   ],
-  plugins: [pluginTypescript(tsConfig)],
+  plugins: [resolve(), pluginTypescript(tsConfig)]
 }

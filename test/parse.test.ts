@@ -15,9 +15,9 @@ describe('generatorTypeStructTree', () => {
         nestedField2: 456,
         nestedField3: true,
         nestedField4: undefined,
-        nestedField5: [7, 8, 9],
+        nestedField5: [7, 8, 9]
       },
-      field7: null,
+      field7: null
     }
 
     const expectedTypeStructureTree = {
@@ -31,13 +31,17 @@ describe('generatorTypeStructTree', () => {
           'field5',
           {
             type: [TypeGroup.Array],
-            children: new Map([['field5__$$children', {
-              type: [TypeGroup.Number],
-              __array_keys_map: new Map([['field5__$$children', 3]]),
-              __array_count: 3,
-            }]]),
-
-          },
+            children: new Map([
+              [
+                'field5__$$children',
+                {
+                  type: [TypeGroup.Number],
+                  __array_keys_map: new Map([['field5__$$children', 3]]),
+                  __array_count: 3
+                }
+              ]
+            ])
+          }
         ],
         [
           'field6',
@@ -52,19 +56,23 @@ describe('generatorTypeStructTree', () => {
                 'nestedField5',
                 {
                   type: [TypeGroup.Array],
-                  children: new Map([['nestedField5__$$children', {
-                    type: [TypeGroup.Number],
-                    __array_keys_map: new Map([['nestedField5__$$children', 3]]),
-                    __array_count: 3,
-                  }]]),
-
-                },
-              ],
-            ]),
-          },
+                  children: new Map([
+                    [
+                      'nestedField5__$$children',
+                      {
+                        type: [TypeGroup.Number],
+                        __array_keys_map: new Map([['nestedField5__$$children', 3]]),
+                        __array_count: 3
+                      }
+                    ]
+                  ])
+                }
+              ]
+            ])
+          }
         ],
-        ['field7', { type: [TypeGroup.Null] }],
-      ]),
+        ['field7', { type: [TypeGroup.Null] }]
+      ])
     }
 
     expect(generatorTypeStructTree(inputObject, 'root', new Map())).toEqual(expectedTypeStructureTree)
@@ -74,7 +82,7 @@ describe('generatorTypeStructTree', () => {
 describe('parseTypeStructTreeToTsType', () => {
   it('should return correct TypeScript type for a simple object', () => {
     const typeStructTree = {
-      type: [TypeGroup.String, TypeGroup.Number, TypeGroup.Boolean, TypeGroup.Undefined, TypeGroup.Null],
+      type: [TypeGroup.String, TypeGroup.Number, TypeGroup.Boolean, TypeGroup.Undefined, TypeGroup.Null]
     }
 
     expect(parseTypeStructTreeToTsType(typeStructTree)).toBe('string | number | boolean | undefined | null')
@@ -87,10 +95,10 @@ describe('parseTypeStructTreeToTsType', () => {
         [
           'field1',
           {
-            type: [TypeGroup.String, TypeGroup.Number],
-          },
-        ],
-      ]),
+            type: [TypeGroup.String, TypeGroup.Number]
+          }
+        ]
+      ])
     }
 
     expect(parseTypeStructTreeToTsType(typeStructTree)).toBe('{\n\tfield1: string | number\n}')
@@ -104,10 +112,10 @@ describe('parseTypeStructTreeToTsType', () => {
           '__$$children',
           {
             type: [TypeGroup.String, TypeGroup.Number],
-            children: new Map(),
-          },
-        ],
-      ]),
+            children: new Map()
+          }
+        ]
+      ])
     }
 
     expect(parseTypeStructTreeToTsType(typeStructTree)).toBe('Array<string | number>')
@@ -120,8 +128,8 @@ describe('parseTypeStructTreeToTsType', () => {
         ['nestedField 1', { type: [TypeGroup.String] }],
         ['123asd', { type: [TypeGroup.Number] }],
         ['asd_1', { type: [TypeGroup.Boolean] }],
-        ['asd_1__$1', { type: [TypeGroup.Undefined] }],
-      ]),
+        ['asd_1__$1', { type: [TypeGroup.Undefined] }]
+      ])
     }
 
     expect(parseTypeStructTreeToTsType(typeStructTree)).toBe(`{

@@ -18,9 +18,9 @@ export default {
       emit('copy')
     }
     return {
-      handleClick,
+      handleClick
     }
-  },
+  }
 }
 </script>
 
