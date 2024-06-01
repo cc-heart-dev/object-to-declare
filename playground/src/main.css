@@ -11,8 +11,21 @@ html,
   height: 100%;
 }
 
-html.dark {
-  color-scheme: dark;
+:root {
+  --text-color: #e5eaf3;
+
+  --bg-color: #141414;
+  --bg-color-2: #181818;
+  --color-text-1: rgba(255, 255, 255, 0.9);
+  --color-text-2: rgba(255, 255, 255, 0.7);
+  --color-text-3: rgba(255, 255, 255, 0.5);
+
+  --box-color-1: rgb(72, 72, 73);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 #nprogress {

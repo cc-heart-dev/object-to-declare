@@ -15,5 +15,9 @@ export const MonacoEditorProps = {
   language: {
     type: String,
     default: 'javascript'
+  },
+  title: {
+    type: String,
+    default: ''
   }
 }
