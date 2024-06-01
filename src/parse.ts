@@ -1,5 +1,5 @@
 import { isNull } from '@cc-heart/utils'
-import { TypeGroup, TypeStructTree } from './helper'
+import { type GeneratorTypeStructTreeOptions, TypeGroup, TypeStructTree } from './helper'
 
 function parseValueMapTypeGroup(target: unknown) {
   const typeMap = {
@@ -20,18 +20,31 @@ function mergeTreeType(currentType: TypeGroup, typeStructTree: TypeStructTree | 
   return [...typeStructTree.type, currentType]
 }
 
-// 递归 children 生成类型
-function recursiveChildrenGenerateType(target: unknown, field: string, typeStructTree: TypeStructTree) {
-  const children = generatorTypeStructTree(target, field, typeStructTree.children)
-  const existChildrenTarget = typeStructTree.children.get(field)
+function recursiveChildrenGenerateType(target: unknown, field: string, typeStructTree: TypeStructTree, options?: GeneratorTypeStructTreeOptions) {
+  const children = generatorTypeStructTree(target, field, typeStructTree.children, options)
+  let existChildrenTarget = typeStructTree.children.get(field)
   if (!existChildrenTarget) {
     typeStructTree.children.set(field, children)
+    existChildrenTarget = children
   } else {
     existChildrenTarget.type = [...new Set([...children.type, ...existChildrenTarget.type])]
   }
+
+  if (options && options.isArrayType) {
+    let count = 0
+    if (!existChildrenTarget.__array_count) {
+      existChildrenTarget.__array_keys_map = new Map()
+    } else {
+      count = existChildrenTarget.__array_keys_map.get(field)
+    }
+    count++
+    existChildrenTarget.__array_keys_map.set(field, count)
+
+    existChildrenTarget.__array_count = options.length
+  }
 }
 
-export function generatorTypeStructTree(target: unknown, field: string | symbol, parentTreeMap?: Map<string | symbol, TypeStructTree>) {
+export function generatorTypeStructTree(target: unknown, field: string | symbol, parentTreeMap?: Map<string | symbol, TypeStructTree>, options?: GeneratorTypeStructTreeOptions) {
   let typeStructTree: TypeStructTree = parentTreeMap?.get(field) ?? {
     type: [],
   }
@@ -57,8 +70,12 @@ export function generatorTypeStructTree(target: unknown, field: string | symbol,
 
       const arrayChildrenField = `${String(field)}__$$children`
 
-        ; (target as Array<unknown>).forEach((item) => {
-          recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree)
+        ; (target as Array<unknown>).forEach((item, _, arr) => {
+          recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
+            ...options,
+            isArrayType: true,
+            length: arr.length
+          })
         })
       break
     case TypeGroup.Object:
@@ -73,7 +90,7 @@ export function generatorTypeStructTree(target: unknown, field: string | symbol,
       typeStructTree.type = mergeTreeType(TypeGroup.Object, typeStructTree)
 
       Object.keys(target).forEach((key) => {
-        recursiveChildrenGenerateType(target[key], key, typeStructTree)
+        recursiveChildrenGenerateType(target[key], key, typeStructTree, options)
       })
       break
     default:
@@ -98,6 +115,18 @@ export function parserKey(key: string) {
   return `'${key}'`
 }
 
+function generateParticleType(field: string, typeStructTree: TypeStructTree) {
+  if (typeStructTree.__array_keys_map) {
+    const count = typeStructTree.__array_keys_map.get(field)
+    if (count === typeStructTree.__array_count)
+      return ''
+
+    return '?'
+
+  }
+  return ''
+}
+
 export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1) {
   const valueList = typeStructTree.type.map((target) => {
     switch (target) {
@@ -113,7 +142,7 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         let val = '{'
         const childrenObjectSpace = space + 1
         for (const [key, value] of typeStructTree.children) {
-          val += `\n${generateSpace(space)}${parserKey(String(key))}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
+          val += `\n${generateSpace(space)}${parserKey(String(key))}${generateParticleType(key, value)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
         }
         val += `\n${generateSpace(space - 1)}}`
         return val

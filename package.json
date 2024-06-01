@@ -19,7 +19,9 @@
     "object2declare"
   ],
   "author": "Carl Chen",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "exports": {
     ".": [

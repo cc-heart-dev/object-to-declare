@@ -70,4 +70,20 @@ describe('generate type when target is object or primitive value', () => {
 }>`
     expect(result.trim()).toEqual(expectedType.trim())
   })
+
+  test('should generate optional properties if not present in every object of array', () => {
+    const complexData = [
+      { a: 1 },
+      { b: '2' },
+      { c: false }
+    ]
+
+    const result = generateTypeDeclaration(complexData)
+    const expectedType = `type IRootName = Array<{
+\ta?: number
+\tb?: string
+\tc?: boolean
+}>`
+    expect(result.trim()).toEqual(expectedType.trim())
+  })
 })

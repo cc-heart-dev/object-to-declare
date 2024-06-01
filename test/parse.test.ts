@@ -31,7 +31,12 @@ describe('generatorTypeStructTree', () => {
           'field5',
           {
             type: [TypeGroup.Array],
-            children: new Map([['field5__$$children', { type: [TypeGroup.Number] }]]),
+            children: new Map([['field5__$$children', {
+              type: [TypeGroup.Number],
+              __array_keys_map: new Map([['field5__$$children', 3]]),
+              __array_count: 3,
+            }]]),
+
           },
         ],
         [
@@ -47,7 +52,12 @@ describe('generatorTypeStructTree', () => {
                 'nestedField5',
                 {
                   type: [TypeGroup.Array],
-                  children: new Map([['nestedField5__$$children', { type: [TypeGroup.Number] }]]),
+                  children: new Map([['nestedField5__$$children', {
+                    type: [TypeGroup.Number],
+                    __array_keys_map: new Map([['nestedField5__$$children', 3]]),
+                    __array_count: 3,
+                  }]]),
+
                 },
               ],
             ]),
