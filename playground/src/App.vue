@@ -54,6 +54,10 @@ const handleChangeJsonValue = (val: string) => {
   compileValue.jsonValue = val
 }
 watchEffect(() => {
+  if (compileValue.jsonValue === '') {
+    compileValue.dtsValue = ''
+    return
+  }
   const target = new Function(`return ${compileValue.jsonValue.trim()}`)()
   compileValue.dtsValue = generateTypeDeclaration(target, {
     rootName: compileValue.rootName || defaultRootName
