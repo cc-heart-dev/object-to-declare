@@ -25,7 +25,7 @@ const getValue = () => {
 }
 
 const emits = defineEmits(['update:modelValue'])
-const debounceUpdateModelValue = defineDebounceFn((event) => {
+const debounceUpdateModelValue = defineDebounceFn(() => {
   emits('update:modelValue', getValue())
 })
 
