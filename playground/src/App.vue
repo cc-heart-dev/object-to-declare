@@ -17,7 +17,7 @@
             class="bg-transparent outline-none border-1px border-solid border-color-#353841 rounded-1 p-y-0.5 p-x-1 color-inherit hover:border-color-#ddd focus:border-color-#ddd transition" />
         </div>
       </div>
-      <div class="flex-1">
+      <div class="flex-1 overflow-auto">
         <Splitpanes class="default-theme" :horizontal="isMobileRef">
           <Pane>
             <MonacoEditor language="json" title="Json" @update:model-value="handleChangeJsonValue" />
