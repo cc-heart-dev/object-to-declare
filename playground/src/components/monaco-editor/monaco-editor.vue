@@ -35,6 +35,7 @@ onMounted(() => {
     value: props.modelValue,
     folding: true,
     theme: props.theme,
+    readOnly: props.readonly,
     scrollbar: {
       verticalScrollbarSize: 8,
       horizontalScrollbarSize: 8

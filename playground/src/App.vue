@@ -23,7 +23,7 @@
             <MonacoEditor language="json" title="Json" @update:model-value="handleChangeJsonValue" />
           </Pane>
           <Pane>
-            <MonacoEditor language="typescript" title="DTS" v-model="compileValue.dtsValue" />
+            <MonacoEditor language="typescript" title="DTS" v-model="compileValue.dtsValue" readonly />
           </Pane>
         </Splitpanes>
       </div>

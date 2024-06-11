@@ -16,6 +16,10 @@ export const MonacoEditorProps = {
     type: String,
     default: 'javascript'
   },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
   title: {
     type: String,
     default: ''
