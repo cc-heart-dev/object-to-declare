@@ -82,4 +82,12 @@ describe('generate type when target is object or primitive value', () => {
 }>`
     expect(result.trim()).toEqual(expectedType.trim())
   })
+
+  test('should generator Array<unknown> when data is a empty array', () => {
+    const complexData = []
+
+    const result = generateTypeDeclaration(complexData)
+
+    expect(result).toBe('type IRootName = Array<unknown>')
+  })
 })
