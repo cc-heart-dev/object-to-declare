@@ -5,7 +5,8 @@ export const enum TypeGroup {
   Null,
   Undefined,
   Array,
-  Object
+  Object,
+  Cycle
 }
 
 export interface ObjectToDtsOptions {

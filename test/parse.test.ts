@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generatorTypeStructTree, parseTypeStructTreeToTsType } from '../src/parse'
+import { deepCloneMarkCycleReference, generatorTypeStructTree, parseTypeStructTreeToTsType } from '../src/parse'
 import { TypeGroup } from '../src/helper'
 
 describe('generatorTypeStructTree', () => {
@@ -138,5 +138,46 @@ describe('parseTypeStructTreeToTsType', () => {
 \tasd_1: boolean
 \tasd_1__$1: undefined
 }`)
+  })
+})
+
+describe('cycle deps', () => {
+
+  it('deepCloneMarkCycleReference', () => {
+    const obj = {
+      a: 1,
+      b: '2',
+      c: null
+    }
+
+    // @ts-expect-error
+    obj.c = obj
+
+    const stack = new Map()
+    const result = deepCloneMarkCycleReference('root', obj, stack)
+    expect(result).toEqual({
+      a: 1,
+      b: '2',
+      c: '__$$__root'
+    })
+    expect(stack.has(obj)).toBeTruthy()
+  })
+
+  it('should return value when target is simple data structure', () => {
+    expect(deepCloneMarkCycleReference('root', 'key')).toBe('key')
+  })
+
+  it('array object cycle deps', () => {
+    const obj = { a: 1, b: '2', c: null }
+
+    // @ts-expect-error
+    obj.c = obj
+
+    const list = [obj]
+    // @ts-ignore
+    list.push(list)
+
+    const stack = new Map()
+    expect(deepCloneMarkCycleReference('root', list, stack)).toEqual([{ a: 1, b: '2', c: '__$$__rootChild' }, "__$$__root"])
   })
 })

@@ -1,5 +1,6 @@
-import { isNull } from '@cc-heart/utils'
+import { capitalize, isNull, isObject } from '@cc-heart/utils'
 import { type GeneratorTypeStructTreeOptions, TypeGroup, TypeStructTree } from './helper'
+import { isCycleDeps, isCycleName } from './constant.js'
 
 function parseValueMapTypeGroup(target: unknown) {
   const typeMap = {
@@ -7,10 +8,15 @@ function parseValueMapTypeGroup(target: unknown) {
     undefined: TypeGroup.Undefined,
     number: TypeGroup.Number,
     boolean: TypeGroup.Boolean,
-    object: TypeGroup.Object
+    object: TypeGroup.Object,
+  }
+
+  if (typeof target === 'string' && target.startsWith('__$$__')) {
+    return TypeGroup.Cycle
   }
 
   const targetType = typeof target
+
   if (Array.isArray(target)) return TypeGroup.Array
   if (isNull(target)) return TypeGroup.Null
   return typeMap[targetType]
@@ -63,6 +69,9 @@ export function generatorTypeStructTree(
       break
     case TypeGroup.Boolean:
       typeStructTree.type = mergeTreeType(TypeGroup.Boolean, typeStructTree)
+      break
+    case TypeGroup.Cycle:
+      typeStructTree.type = mergeTreeType(TypeGroup.Cycle, { type: [(target as string).split('__$$__')[1] as unknown as TypeGroup] })
       break
     case TypeGroup.Undefined:
       typeStructTree.type = mergeTreeType(TypeGroup.Undefined, typeStructTree)
@@ -130,7 +139,7 @@ function generateParticleType(field: string, typeStructTree: TypeStructTree) {
 }
 
 export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1) {
-  const valueList = typeStructTree.type.map((target) => {
+  const valueList = typeStructTree.type.map((target, index) => {
     switch (target) {
       case TypeGroup.Boolean:
         return 'boolean'
@@ -140,6 +149,8 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         return 'string'
       case TypeGroup.Undefined:
         return 'undefined'
+      case TypeGroup.Cycle:
+        return ''
       case TypeGroup.Object:
         let val = '{'
         const childrenObjectSpace = space + 1
@@ -158,8 +169,39 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         const arrayType = arrayVal.length === 0 ? 'unknown' : arrayVal.join(' | ')
         return `Array<${arrayType}>`
     }
+
+    if (typeof target === 'string' && typeStructTree.type.length === 2) {
+      return capitalize((typeStructTree.type[index] as unknown as string) || '') || 'unknown'
+    }
     return 'null'
   })
 
-  return [...new Set(valueList)].join(' | ')
+  return [...new Set(valueList)].filter(Boolean).join(' | ')
+}
+
+export function deepCloneMarkCycleReference(key: string, target: unknown, stack: Map<unknown, string> = new Map()) {
+  if (typeof target === 'object' && !isNull(target)) {
+    if (stack.has(target)) {
+      const cycleKey = stack.get(target)
+      Reflect.set(target, isCycleDeps, true)
+      Reflect.set(target, isCycleName, cycleKey)
+      return '__$$__' + cycleKey
+    } else {
+      stack.set(target, key)
+    }
+
+    if (Array.isArray(target)) {
+      return target.map(r => deepCloneMarkCycleReference(`${key}Child`, r, stack))
+    } else if (isObject(target)) {
+      return Object.keys(target).reduce((acc, targetKey) => {
+        let value = target[targetKey];
+        if (typeof value === 'object') {
+          value = deepCloneMarkCycleReference(targetKey, value, stack)
+        }
+        acc[targetKey] = value
+        return acc
+      }, {})
+    }
+  }
+  return target
 }
