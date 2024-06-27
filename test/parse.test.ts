@@ -142,7 +142,6 @@ describe('parseTypeStructTreeToTsType', () => {
 })
 
 describe('cycle deps', () => {
-
   it('deepCloneMarkCycleReference', () => {
     const obj = {
       a: 1,
@@ -178,6 +177,9 @@ describe('cycle deps', () => {
     list.push(list)
 
     const stack = new Map()
-    expect(deepCloneMarkCycleReference('root', list, stack)).toEqual([{ a: 1, b: '2', c: '__$$__rootChild' }, "__$$__root"])
+    expect(deepCloneMarkCycleReference('root', list, stack)).toEqual([
+      { a: 1, b: '2', c: '__$$__rootChild' },
+      '__$$__root'
+    ])
   })
 })

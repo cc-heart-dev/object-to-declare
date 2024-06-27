@@ -25,5 +25,13 @@
     "emitDeclarationOnly": true,
     "noImplicitReturns": false
   },
-  "exclude": ["test/**/*", "playground/**/*", "rollup.config.js", "vitest.config.ts", "example/**/*", "plugins/**/*", "node_modules/**/*"]
+  "exclude": [
+    "test/**/*",
+    "playground/**/*",
+    "rollup.config.js",
+    "vitest.config.ts",
+    "example/**/*",
+    "plugins/**/*",
+    "node_modules/**/*"
+  ]
 }

@@ -13,7 +13,7 @@ export default function generateTypeDeclaration(target: unknown, options: Object
   const isObj = typeof target === 'object' && target !== null
   const cloneTarget = isObj ? deepCloneMarkCycleReference(options.rootName, target, stack) : target
 
-  const typeStructTree = generatorTypeStructTree(cloneTarget, options.rootName);
+  const typeStructTree = generatorTypeStructTree(cloneTarget, options.rootName)
   let typeStr = ''
   if (isObj) {
     typeStr = [...stack.entries()]
@@ -21,20 +21,23 @@ export default function generateTypeDeclaration(target: unknown, options: Object
         return _ && _ !== target && Reflect.get(_, isCycleDeps)
       })
       .map(([t]) => {
-
         const rootName = Reflect.get(t, isCycleName)
         if (!rootName) return ''
         return generateTypeDeclaration(t, {
           ...options,
           rootName
         })
-      }).join('\n')
+      })
+      .join('\n')
 
     if (typeStr) typeStr += '\n'
   }
 
   const declareType = isObject(cloneTarget) ? 'interface' : 'type'
-  return `${typeStr}${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` + parseTypeStructTreeToTsType(typeStructTree)
+  return (
+    `${typeStr}${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` +
+    parseTypeStructTreeToTsType(typeStructTree)
+  )
 }
 
 export * from './version.js'

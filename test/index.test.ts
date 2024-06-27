@@ -90,4 +90,15 @@ describe('generate type when target is object or primitive value', () => {
 
     expect(result).toBe('type IRootName = Array<unknown>')
   })
+
+  test('attribute should require', () => {
+    const complexData = [{ data: [{ a: 1 }] }, { data: [{ a: 1 }] }, { data: [{ a: 1 }] }]
+
+    const result = generateTypeDeclaration(complexData)
+    expect(result).toBe(`type IRootName = Array<{
+\tdata: Array<{
+\t\ta: number
+\t}>
+}>`)
+  })
 })

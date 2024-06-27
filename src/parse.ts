@@ -8,7 +8,7 @@ function parseValueMapTypeGroup(target: unknown) {
     undefined: TypeGroup.Undefined,
     number: TypeGroup.Number,
     boolean: TypeGroup.Boolean,
-    object: TypeGroup.Object,
+    object: TypeGroup.Object
   }
 
   if (typeof target === 'string' && target.startsWith('__$$__')) {
@@ -26,7 +26,12 @@ function mergeTreeType(currentType: TypeGroup, typeStructTree: TypeStructTree | 
   return [...typeStructTree.type, currentType]
 }
 
-function recursiveChildrenGenerateType(target: unknown, field: string, typeStructTree: TypeStructTree, options?: GeneratorTypeStructTreeOptions) {
+function recursiveChildrenGenerateType(
+  target: unknown,
+  field: string,
+  typeStructTree: TypeStructTree,
+  options?: GeneratorTypeStructTreeOptions
+) {
   const children = generatorTypeStructTree(target, field, typeStructTree.children, options)
   let existChildrenTarget = typeStructTree.children.get(field)
   if (!existChildrenTarget) {
@@ -71,7 +76,9 @@ export function generatorTypeStructTree(
       typeStructTree.type = mergeTreeType(TypeGroup.Boolean, typeStructTree)
       break
     case TypeGroup.Cycle:
-      typeStructTree.type = mergeTreeType(TypeGroup.Cycle, { type: [(target as string).split('__$$__')[1] as unknown as TypeGroup] })
+      typeStructTree.type = mergeTreeType(TypeGroup.Cycle, {
+        type: [(target as string).split('__$$__')[1] as unknown as TypeGroup]
+      })
       break
     case TypeGroup.Undefined:
       typeStructTree.type = mergeTreeType(TypeGroup.Undefined, typeStructTree)
@@ -84,13 +91,13 @@ export function generatorTypeStructTree(
 
       const arrayChildrenField = `${String(field)}__$$children`
 
-        ; (target as Array<unknown>).forEach((item, _, arr) => {
-          recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
-            ...options,
-            isArrayType: true,
-            length: arr.length
-          })
+      ;(target as Array<unknown>).forEach((item, _, arr) => {
+        recursiveChildrenGenerateType(item, arrayChildrenField, typeStructTree, {
+          ...options,
+          isArrayType: true,
+          length: arr.length
         })
+      })
       break
     case TypeGroup.Object:
       if (parentTreeMap && !parentTreeMap.get(field)) {
@@ -131,9 +138,8 @@ export function parserKey(key: string) {
 function generateParticleType(field: string, typeStructTree: TypeStructTree) {
   if (typeStructTree.__array_keys_map) {
     const count = typeStructTree.__array_keys_map.get(field)
-    if (count === typeStructTree.__array_count) return ''
 
-    return '?'
+    if (count < typeStructTree.__array_count) return '?'
   }
   return ''
 }
@@ -191,10 +197,10 @@ export function deepCloneMarkCycleReference(key: string, target: unknown, stack:
     }
 
     if (Array.isArray(target)) {
-      return target.map(r => deepCloneMarkCycleReference(`${key}Child`, r, stack))
+      return target.map((r) => deepCloneMarkCycleReference(`${key}Child`, r, stack))
     } else if (isObject(target)) {
       return Object.keys(target).reduce((acc, targetKey) => {
-        let value = target[targetKey];
+        let value = target[targetKey]
         if (typeof value === 'object') {
           value = deepCloneMarkCycleReference(targetKey, value, stack)
         }

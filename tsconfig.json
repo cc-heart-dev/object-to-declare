@@ -23,5 +23,13 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "exclude": ["test/**/*", "node_modules/**/*", "playground/**/*", "rollup.config.js", "vitest.config.ts", "example/**/*", "plugins/**/*"]
+  "exclude": [
+    "test/**/*",
+    "node_modules/**/*",
+    "playground/**/*",
+    "rollup.config.js",
+    "vitest.config.ts",
+    "example/**/*",
+    "plugins/**/*"
+  ]
 }
