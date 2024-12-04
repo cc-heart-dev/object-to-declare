@@ -4,7 +4,7 @@ import generateTypeDeclaration from '../src'
 describe('generate type when target is object or primitive value', () => {
   test('Generates type declaration for empty object', () => {
     const result = generateTypeDeclaration({}, {})
-    expect(result).toBe('interface IRootName  {\n}')
+    expect(result).toBe('interface IRootName {\n}')
   })
 
   test('Generates type declaration for simple object', () => {
@@ -100,5 +100,12 @@ describe('generate type when target is object or primitive value', () => {
 \t\ta: number
 \t}>
 }>`)
+  })
+
+  test('should return Array<unknown> when result is empty', () => {
+    const complexData = { list: [] }
+    expect(generateTypeDeclaration(complexData)).toBe(`interface IRootName {
+\tlist: Array<unknown>
+}`)
   })
 })

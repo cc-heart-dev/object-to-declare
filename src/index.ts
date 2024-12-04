@@ -35,7 +35,7 @@ export default function generateTypeDeclaration(target: unknown, options: Object
 
   const declareType = isObject(cloneTarget) ? 'interface' : 'type'
   return (
-    `${typeStr}${declareType} ${options.rootName} ${declareType === 'interface' ? '' : '='} ` +
+    `${typeStr}${declareType} ${options.rootName}${declareType === 'interface' ? '' : ' ='} ` +
     parseTypeStructTreeToTsType(typeStructTree)
   )
 }
