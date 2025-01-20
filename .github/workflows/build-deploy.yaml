@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install Dependencies
-        run: pnpm install
+        run: cd playground && pnpm install
 
       - name: Build playground Site
         run: cd playground && pnpm run build
