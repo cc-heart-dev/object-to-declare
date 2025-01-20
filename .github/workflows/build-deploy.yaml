@@ -47,6 +47,6 @@ jobs:
           folder: playground/dist
           token: ${{ secrets.GITHUB_TOKEN }}
           repository-name: cc-heart-dev/object-to-declare
-          target-folder: /
+          target-folder: ./
           single-commit: true
           clean: true
