@@ -37,9 +37,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build Vue Utils
-        run: pnpm run build:vue-utils
-
       - name: Build playground Site
         run: cd playground && pnpm run build
 
