@@ -1,5 +1,4 @@
-name: Build and Deploy Element Plus
-
+name: Build and Deploy Playground
 on:
   push:
     branches:
@@ -12,24 +11,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        run: corepack enable
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'pnpm'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install Dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
+
       - name: Build Vue Utils
         run: pnpm run build:vue-utils
 
       - name: Build playground Site
         run: cd playground && pnpm run build
 
-      - name: Deploy to playgounr packages
+      - name: Deploy to playground packages
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: docs
@@ -39,4 +53,3 @@ jobs:
           target-folder: /
           single-commit: true
           clean: true
-
