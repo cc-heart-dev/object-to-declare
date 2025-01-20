@@ -1,0 +1,42 @@
+name: Build and Deploy Element Plus
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Build Vue Utils
+        run: pnpm run build:vue-utils
+
+      - name: Build playground Site
+        run: cd playground && pnpm run build
+
+      - name: Deploy to playgounr packages
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          branch: docs
+          folder: playground/dist
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository-name: cc-heart-dev/object-to-declare
+          target-folder: /
+          single-commit: true
+          clean: true
+
