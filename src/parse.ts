@@ -1,6 +1,36 @@
-import { capitalize, isNull, isObject } from '@cc-heart/utils'
+import { isNull } from '@cc-heart/utils'
 import { type GeneratorTypeStructTreeOptions, TypeGroup, TypeStructTree } from './helper'
 import { isCycleDeps, isCycleName } from './constant.js'
+
+export interface RuntimeTypeInfo {
+  type: string
+  isOptional: boolean
+  description?: string
+}
+
+export interface TypeMetadata {
+  name: string
+  properties: Map<string, RuntimeTypeInfo>
+  extends?: string[]
+}
+
+export const typeRegistry = new Map<string, TypeMetadata>()
+
+export function registerType(name: string, metadata: TypeMetadata) {
+  typeRegistry.set(name, metadata)
+}
+
+export function getTypeInfo(name: string): TypeMetadata | undefined {
+  return typeRegistry.get(name)
+}
+
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
 function parseValueMapTypeGroup(target: unknown) {
   const typeMap = {
@@ -26,7 +56,7 @@ function mergeTreeType(currentType: TypeGroup, typeStructTree: TypeStructTree | 
   return [...typeStructTree.type, currentType]
 }
 
-function recursiveChildrenGenerateType(
+export function recursiveChildrenGenerateType(
   target: unknown,
   field: string,
   typeStructTree: TypeStructTree,
@@ -135,7 +165,7 @@ export function parserKey(key: string) {
   return `'${key}'`
 }
 
-function generateParticleType(field: string, typeStructTree: TypeStructTree) {
+export function generateParticleType(field: string, typeStructTree: TypeStructTree) {
   if (typeStructTree.__array_keys_map) {
     const count = typeStructTree.__array_keys_map.get(field)
 
@@ -144,7 +174,7 @@ function generateParticleType(field: string, typeStructTree: TypeStructTree) {
   return ''
 }
 
-export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1) {
+export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, space = 1, typeName?: string) {
   const valueList = typeStructTree.type.map((target, index) => {
     switch (target) {
       case TypeGroup.Boolean:
@@ -157,23 +187,42 @@ export function parseTypeStructTreeToTsType(typeStructTree: TypeStructTree, spac
         return 'undefined'
       case TypeGroup.Cycle:
         return ''
-      case TypeGroup.Object:
+      case TypeGroup.Object: {
         let val = '{'
         const childrenObjectSpace = space + 1
-        for (const [key, value] of typeStructTree.children) {
-          val += `\n${generateSpace(space)}${parserKey(String(key))}${generateParticleType(key, value)}: ${parseTypeStructTreeToTsType(value, childrenObjectSpace)}`
+        const metadata: TypeMetadata = {
+          name: typeName || 'Anonymous',
+          properties: new Map()
         }
-        val += `\n${generateSpace(space - 1)}}`
+
+        for (const [key, value] of typeStructTree.children) {
+          const propertyType = parseTypeStructTreeToTsType(value, childrenObjectSpace, `${typeName}_${key}`)
+          const isOptional = generateParticleType(key, value) === '?'
+          metadata.properties.set(key, {
+            type: propertyType,
+            isOptional,
+            description: `Auto-generated from runtime type analysis`
+          })
+          val += `\n${generateSpace(space)}${parserKey(String(key))}${isOptional ? '?' : ''}: ${propertyType}`
+        }
+        val += `\n${generateSpace(space - 1)}}` 
+
+        if (typeName) {
+          registerType(typeName, metadata)
+        }
         return val
-      case TypeGroup.Array:
+      }
+      case TypeGroup.Array: {
         let arrayVal = []
         const childrenArraySpace = space + 1
         for (const [, value] of typeStructTree.children) {
           const childrenSpace = typeof value === 'object' && value !== null ? space : childrenArraySpace
-          arrayVal.push(parseTypeStructTreeToTsType(value, childrenSpace))
+          const elementTypeName = typeName ? `${typeName}Element` : undefined
+          arrayVal.push(parseTypeStructTreeToTsType(value, childrenSpace, elementTypeName))
         }
         const arrayType = arrayVal.length === 0 ? 'unknown' : arrayVal.join(' | ')
         return `Array<${arrayType}>`
+      }
     }
 
     if (typeof target === 'string' && typeStructTree.type.length === 2) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { deepCloneMarkCycleReference, generatorTypeStructTree, parseTypeStructTreeToTsType } from '../src/parse'
+import { deepCloneMarkCycleReference, generatorTypeStructTree, parseTypeStructTreeToTsType, recursiveChildrenGenerateType, generateParticleType, getTypeInfo } from '../src/parse'
 import { TypeGroup } from '../src/helper'
+
 
 describe('generatorTypeStructTree', () => {
   it('should generate correct type structure tree for simple object', () => {
@@ -80,6 +81,25 @@ describe('generatorTypeStructTree', () => {
 })
 
 describe('parseTypeStructTreeToTsType', () => {
+  it('should handle empty type array', () => {
+    const typeStructTree = { type: [] }
+    expect(parseTypeStructTreeToTsType(typeStructTree)).toBe('')
+  })
+
+
+  it('should handle object with type metadata', () => {
+    const typeStructTree = {
+      type: [TypeGroup.Object],
+      children: new Map([
+        ['test', { type: [TypeGroup.String] }]
+      ])
+    }
+    const result = parseTypeStructTreeToTsType(typeStructTree, 1, 'TestType')
+    expect(result).toContain('test: string')
+    const typeInfo = getTypeInfo('TestType')
+    expect(typeInfo).toBeDefined()
+  })
+
   it('should return correct TypeScript type for a simple object', () => {
     const typeStructTree = {
       type: [TypeGroup.String, TypeGroup.Number, TypeGroup.Boolean, TypeGroup.Undefined, TypeGroup.Null]
@@ -138,6 +158,66 @@ describe('parseTypeStructTreeToTsType', () => {
 \tasd_1: boolean
 \tasd_1__$1: undefined
 }`)
+  })
+})
+
+describe('parseValueMapTypeGroup and mergeTreeType', () => {
+  it('should handle undefined values correctly', () => {
+    const result = generatorTypeStructTree(undefined, 'test')
+    expect(result.type).toContain(TypeGroup.Undefined)
+  })
+
+  it('should handle string values with __$$__ prefix', () => {
+    const result = generatorTypeStructTree('__$$__TestType', 'test')
+    expect(result.type).toContain(TypeGroup.Cycle)
+  })
+})
+
+describe('recursiveChildrenGenerateType', () => {
+  it('should handle array type options correctly', () => {
+    const typeStructTree = {
+      type: [],
+      children: new Map()
+    }
+    const target = [1, 2, 3]
+    recursiveChildrenGenerateType(target, 'test', typeStructTree, {
+      isArrayType: true,
+      length: target.length
+    })
+    const child = typeStructTree.children.get('test')
+    expect(child.__array_count).toBe(3)
+    expect(child.__array_keys_map.get('test')).toBe(1)
+  })
+
+  it('should merge types when child already exists', () => {
+    const typeStructTree = {
+      type: [],
+      children: new Map([['test', { type: [TypeGroup.String] }]])
+    }
+    recursiveChildrenGenerateType(123, 'test', typeStructTree)
+    const child = typeStructTree.children.get('test')
+    expect(child!.type).toContain(TypeGroup.String)
+    expect(child!.type).toContain(TypeGroup.Number)
+  })
+})
+
+describe('generateParticleType', () => {
+  it('should return ? for partial array items', () => {
+    const typeStructTree = {
+      type: [TypeGroup.Array],
+      __array_count: 3,
+      __array_keys_map: new Map([['field', 2]])
+    }
+    expect(generateParticleType('field', typeStructTree)).toBe('?')
+  })
+
+  it('should return empty string for complete array items', () => {
+    const typeStructTree = {
+      type: [TypeGroup.Array],
+      __array_count: 3,
+      __array_keys_map: new Map([['field', 3]])
+    }
+    expect(generateParticleType('field', typeStructTree)).toBe('')
   })
 })
 

@@ -1,11 +1,15 @@
-import { isObject } from '@cc-heart/utils'
 import { type ObjectToDtsOptions } from './helper'
-import { deepCloneMarkCycleReference, generatorTypeStructTree, parseTypeStructTreeToTsType } from './parse.js'
+import { deepCloneMarkCycleReference, generatorTypeStructTree, parseTypeStructTreeToTsType, getTypeInfo, registerType, typeRegistry, type TypeMetadata } from './parse.js'
 import { isCycleDeps, isCycleName } from './constant.js'
 
-export default function generateTypeDeclaration(target: unknown, options: ObjectToDtsOptions = {}) {
+export interface GenerateTypeOptions extends ObjectToDtsOptions {
+  collectMetadata?: boolean
+}
+
+export default function generateTypeDeclaration(target: unknown, options: GenerateTypeOptions = {}) {
   const defaultOptions = {
-    rootName: 'IRootName'
+    rootName: 'IRootName',
+    collectMetadata: true
   }
 
   options = { ...defaultOptions, ...options }
@@ -33,11 +37,24 @@ export default function generateTypeDeclaration(target: unknown, options: Object
     if (typeStr) typeStr += '\n'
   }
 
-  const declareType = isObject(cloneTarget) ? 'interface' : 'type'
-  return (
+  const declareType = target !== null && typeof target === 'object' && !Array.isArray(target) ? 'interface' : 'type'
+  const declaration = (
     `${typeStr}${declareType} ${options.rootName}${declareType === 'interface' ? '' : ' ='} ` +
-    parseTypeStructTreeToTsType(typeStructTree)
+    parseTypeStructTreeToTsType(typeStructTree, 1, options.collectMetadata ? options.rootName : undefined)
   )
+
+  return declaration
 }
+
+export function getRegisteredTypes(): Map<string, TypeMetadata> {
+  const types = new Map<string, TypeMetadata>()
+  for (const [name, metadata] of typeRegistry.entries()) {
+    types.set(name, { ...metadata })
+  }
+  return types
+}
+
+export { getTypeInfo, registerType }
+export type { TypeMetadata }
 
 export * from './version.js'
